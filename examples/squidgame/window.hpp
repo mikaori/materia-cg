@@ -19,8 +19,11 @@ private:
   int m_gameLevel{0};
   int m_answers[10];
 
-  enum class GameState { Play, PlayNext, PlayNewLife, Win, Lost };
+  enum class GameState { Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame };
+  enum class PlayerChoice { Left, Right, NotPlayed };
   GameState m_gameState;
+  GameState m_futureGameState;
+  PlayerChoice m_playerChoice;
 
   //bool m_XsTurn{true};
   std::array<char, l_N * c_N> m_board{}; // '\0', 'X' or 'O'
@@ -28,11 +31,14 @@ private:
   ImFont *m_font{};
 
   void checkEndCondition();
-  void restartGame();
+  void startGame();
   void generateRandomAnswer();
-  void checkIfAnswerIsCorrect();
-  void clearGame();
-  void newStartGame();
+  bool checkIfAnswerIsCorrect();
+  void resetGame();
+  void restartForPlayer();
+  void failed();
+  void play();
+  void played();
 };
 
 #endif

@@ -8,10 +8,36 @@ void Window::onCreate() {
     throw abcg::RuntimeError{"Cannot load font file"};
   }
   generateRandomAnswer();
-  restartGame();
+  startGame();
 }
 
 void Window::onPaintUI() {
+
+  // Processamento dos estados
+  switch (m_gameState) {
+      case GameState::Play:
+        play();
+        break;
+      case GameState::Played:
+        played();
+        break;
+      case GameState::Failed:
+        failed();
+        break;
+      case GameState::Win:
+       
+        break;
+      case GameState::Lost:
+       
+        break;
+      case GameState::RestartForPlayer:
+        restartForPlayer();
+        break;
+      case GameState::ResetGame:
+        resetGame();
+        break;
+      }
+
   // Get size of application's window
   auto const appWindowWidth{gsl::narrow<float>(getWindowSettings().width)};
   auto const appWindowHeight{gsl::narrow<float>(getWindowSettings().height)};
@@ -36,7 +62,7 @@ void Window::onPaintUI() {
         ImGui::EndMenuBar();
       }
       if (restartSelected) {
-        restartGame();
+        startGame();
       }
     }
 
@@ -102,10 +128,10 @@ void Window::onPaintUI() {
       case GameState::Play:
         text = "Choose your left ou right to live or not...";
         break;
-      case GameState::PlayNext:
+      case GameState::Played:
         text = "You hit! Try to pass the next step!";
         break;
-      case GameState::PlayNewLife:
+      case GameState::Failed:
         text = "Oh no, you failed! We have to start over!";
         break;
       case GameState::Win:
@@ -150,10 +176,10 @@ void Window::onPaintUI() {
             // Button text is ch followed by an ID in the format ##ij
             auto buttonText{fmt::format("{}##{}{}", ch, i, j)};
             if (ImGui::Button(buttonText.c_str(), ImVec2(-1, buttonHeight))) {
-              //if (m_gameState == GameState::Play) {
+              if (m_gameState == GameState::Play || m_gameState == GameState::Played) {
                 m_board.at(offset) = 'X';
                 checkIfAnswerIsCorrect();
-              //}
+              }
             }
           }
           ImGui::Spacing();
@@ -168,12 +194,13 @@ void Window::onPaintUI() {
     // "Restart game" button
     {
       if (ImGui::Button("New Start game", ImVec2(-1, 50))) {
-        newStartGame();
+        startGame();
       }
     }
 
     ImGui::End();
   }
+  m_gameState =  m_futureGameState; 
 }
 
 // Generate an random array with 0 or 1 
@@ -189,36 +216,54 @@ void Window::generateRandomAnswer(){
 }
 
 
-void Window::checkIfAnswerIsCorrect() {
-  if (m_gameState != GameState::Play) {
-    return;
-  }
-  
-  // Check rows
+bool Window::checkIfAnswerIsCorrect() {
   for (auto const j : iter::range(c_N)) {
-    if(j == m_answers[m_gameLevel]){
-      m_gameState = GameState::PlayNext;
-      clearGame();
-    } else{
-      m_gameState = GameState::PlayNewLife;
-      restartGame();
-    }
+    return j == m_answers[m_gameLevel];
   }
 }
 
-void Window::restartGame() {
+void Window::resetGame() {
   m_board.fill('\0');
   m_gameLevel = 0;
+  m_futureGameState = GameState::Play;
 }
 
-void Window::clearGame() {
-  m_board.fill('\0');
-  m_gameLevel++;
+void Window::restartForPlayer() {
+  if (m_gameLevel<last_level){
+    m_board.fill('\0');
+    m_gameLevel++;
+    m_futureGameState = GameState::Play;
+  } else{
+    m_futureGameState = GameState::Win;
+  }
 }
 
-void Window::newStartGame() {
+void Window::startGame() {
   m_board.fill('\0');
-  m_gameState = GameState::Play;
   m_gameLevel = 0;
   generateRandomAnswer();
+
+  m_futureGameState = GameState::Play;
+}
+
+void Window::play(){
+  if(m_playerChoice != PlayerChoice::NotPlayed){
+    m_futureGameState = GameState::Played;
+  }
+}
+
+void Window:: played(){
+  if (checkIfAnswerIsCorrect()){
+    m_futureGameState = GameState::RestartForPlayer;
+  } else {
+    m_futureGameState = GameState::Failed;
+  }
+}
+
+void Window::failed() {
+  /* if(vida == 0 ){
+        m_futureGameState = GameState::Lost;
+      }else{
+        m_futureGameState = GameState::ResetGame;
+      }*/
 }
