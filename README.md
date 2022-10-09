@@ -1,116 +1,59 @@
-# ABCg
-
-![linux workflow](https://github.com/hbatagelo/abcg/actions/workflows/linux.yml/badge.svg)
-![macOS workflow](https://github.com/hbatagelo/abcg/actions/workflows/macos.yml/badge.svg)
-![Windows workflow](https://github.com/hbatagelo/abcg/actions/workflows/windows.yml/badge.svg)
-![WASM workflow](https://github.com/hbatagelo/abcg/actions/workflows/wasm.yml/badge.svg)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/hbatagelo/abcg)](https://github.com/hbatagelo/abcg/releases/latest)
-
-Development framework accompanying the course [MCTA008-17 Computer Graphics](http://professor.ufabc.edu.br/~harlen.batagelo/cg/) at [UFABC](https://www.ufabc.edu.br/).
-
-[Documentation](https://hbatagelo.github.io/abcg/abcg/doc/html/) \| [Release notes](CHANGELOG.md) 
-
-ABCg is a lightweight C++ framework that simplifies the development of 3D graphics applications based on [OpenGL](https://www.opengl.org), [OpenGL ES](https://www.khronos.org), [WebGL](https://www.khronos.org/webgl/), and [Vulkan](https://www.vulkan.org). It is designed for the tutorials and assignments of the course "MCTA008-17 Computer Graphics" taught at Federal University of ABC (UFABC).
+### Michelle Kaori Hamada RA 21039716
 
 * * *
 
-## Main features
+# Atividades 
 
--   Supported platforms: Linux, mac OS, Windows, WebAssembly.
--   Supported backends: OpenGL 3.3+, OpenGL ES 3.0+, WebGL 2.0 (via Emscripten), Vulkan 1.3.
--   Applications that use the common subset of functions between OpenGL 3.3 and OpenGL ES 3.0 can be built for WebGL 2.0 using the same source code. 
--   OpenGL functions can be qualified with the `abcg::` namespace to enable throwing exceptions with descriptive GL error messages that include the source code location.
--   Includes helper classes and functions for loading textures (using [SDL_image](https://www.libsdl.org/projects/SDL_image/)), loading OBJ 3D models (using [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)), and compiling GLSL shaders to SPIR-V with [glslang](https://github.com/KhronosGroup/glslang).
+## SquidGame
 
-* * *
+**Como é a aplicação?**
 
-## Requirements
+A aplicação é uma representação da Ponte de Crital, este jogo é apresentado na série Round 6 como o quinto desafio dos participantes. 
 
-The following minimum requirements are shared among all platforms:
+Para ver esta cena e conhecer mais sobre a inspiração desse jogo veja o vídeo abaixo clicando na imagem! :grin:
 
--   [CMake](https://cmake.org/) 3.21.
--   A C++ compiler with at least partial support for C++20 (tested with GCC 11, Clang 13, MSVC 17, and emcc 3.1).
--   A system with support for OpenGL 3.3 (OpenGL backend) or Vulkan 1.3 (Vulkan backend). Conformant software rasterizers such as Mesa's [Gallium llvmpipe](https://docs.mesa3d.org/drivers/llvmpipe.html) and lavapipe (post Jun 2022) are supported. Mesa's [D3D12](https://devblogs.microsoft.com/directx/directx-heart-linux/) backend on [WSL 2.0](https://docs.microsoft.com/en-us/windows/wsl/install) is supported as well.
+<a href="https://www.youtube.com/watch?v=97Je5DrBWQw" target="_blank"><img src="http://img.youtube.com/vi/97Je5DrBWQw/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
-For WebAssembly:
+Nesta pequena adaptação o objetivo consistem em sobreviver à Ponte de Cristal para ganhar o dinheiro, assim como ocorre na série. 
 
--   [Emscripten](https://emscripten.org/).
--   A browser with support for WebGL 2.0.
+O jogador possui três vidas para conseguir passar os levels. Ao todo são cinco níveis (indo do level 0 até o level 4) para conseguir passar pela ponte e ganhar o jogo!
 
-For building desktop applications:
+Portanto, temos quatro casos: 
+1. Caso o jogador acerte a escolha, ele passa para o próximo level.
 
--   [SDL](https://www.libsdl.org/) 2.0.
--   [SDL_image](https://www.libsdl.org/projects/SDL_image/) 2.0.
--   [GLEW](http://glew.sourceforge.net/) 2.2.0 (required for OpenGL-based applications).
--   [Vulkan](https://www.lunarg.com/vulkan-sdk/) 1.3 (required for Vulkan-based applications).
+2. Caso o jogador consiga passar por todos os levels, ele vence a partida ganhando o jogo. :money_mouth_face: 
 
-Desktop dependencies can be resolved automatically with [Conan](https://conan.io/). It is disabled by default. To use it, install Conan 1.47 or later and then configure CMake with `-DENABLE_CONAN=ON`.
+3. Caso o jogador erre a escolha, o jogo reinicia e o jogador volta para o nível zero mas dessa vez com uma vida a menos. A sequencia da resposta permanece a mesma, portanto durante a partida o jogador deve lembrar de suas escolhas. A sequencia de resposta só inicia caso o jogador escolha restartar pelo menu ou clique botão New Start game.
 
-The default renderer backend is OpenGL (CMake option `GRAPHICS_API=OpenGL`). To use the Vulkan backend, configure CMake with `-DGRAPHICS_API=Vulkan`.
+4. Caso o jogador perca todas as vidas e não consiga passar, ele perde e o jogo **encerra sozinho** representando a morte final do personagem. :skull_and_crossbones:
 
-* * *
 
-## Installation and usage
+**Implementações realizadas:**
 
-Start by cloning the repository:
+*Interface*
+- Menu contendo a opção de restart. 
 
-    # Get abcg repo
-    git clone https://github.com/hbatagelo/abcg.git
+- Duas linhas estáticas na cor branca contendo um resumo da história do jogo.
 
-    # Enter the directory
-    cd abcg
+- Duas linhas vermelhas contendo informações sobre o estado jogo. A primeira linha contém informações sobre a vida do jogador e o level que ele se encontra. Na linha vermelha abaixo tem-se os textos sobre o estado atual jogo.
 
-Follow the instructions below to build the "Hello, World!" sample located in `abcg/examples/helloworld`.
+- Dois botões que são uma abstração de cada uma das vidraças no qual os participantes da série tem que escolher para atravessar a ponte. 
 
-### Windows
+*Implementação do código*
+- A estrutura do código foi implementada com base em máquina de estados. Dessa forma, tem-se oito estados: Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame, StartGame.
 
--   Run `build-vs.bat` for building with the Visual Studio 2022 toolchain.
--   Run `build.bat` for building with GCC (MinGW-w64).
+        1. StartGame: Inicia o jogo, seta os parâmetros defaults necessários e reseta os botões para o jogador iniciar o jogo do zero.
+        2. Play: Verifica se o jogador clicou em algum dos botões.
+        3. Played: Verifica se o jogador acertou a resposta.
+        4. Failed: Verifica se o jogador ainda possui vida para tentar jogar novamente.
+        5. RestartForPlayer: Verifica se o jogador possui mais um nível para jogar ou se conseguiu passar por todos os níveis.
+        6. ResetGame: Reseta o jogo durante a partida atual. Ou seja, se o jogador ainda possui vida para jogar, este estado atua para resetar o jogo para ele conseguir jogar novamente.
+        7. Win: Jogador ganhou a partida.
+        8. Lost: Jogador perdeu a partida. A aplicação foi programada para encerrar sozinha nesse estado. 
 
-`build-vs.bat` and `build.bat` accept two optional arguments: (1) the build type, which is `Release` by default, and (2) an extra CMake option. For example, for a `Debug` build with `-DENABLE_CONAN=ON` using VS 2022, run 
+- A interação do usuário ocorre por meio de interações com o botão. Quando o usuário seleciona um dos botões o jogo verifica se o usuário selecionou o botão da esquerda ou da direita para posteriormente realizar a checagem da resposta correta. 
 
-    build-vs.bat Debug -DENABLE_CONAN=ON
+- Cada vez que o jogo é iniciado gera-se uma array com respostas aleatórias. Cada valor em uma posição i da array representa a resposta correta no level i. O valor zero representa o botão esquerdo e o valor 1 representa o botão a direita. 
 
-### Linux and macOS
-
-Run `./build.sh`.
-
-The script accepts two optional arguments: (1) the build type, which is `Release` by default, and (2) an extra CMake option. For example, for a `Debug` build with `-DENABLE_CONAN=ON`, run 
-
-    ./build.sh Debug -DENABLE_CONAN=ON
-
-### WebAssembly
-
-1.  Run `build-wasm.bat` (Windows) or `./build-wasm.sh` (Linux/macOS).
-2.  Run `runweb.bat` (Windows) or `./runweb.sh` (Linux/macOS) for setting up a local web server.
-3.  Open <http://localhost:8080/helloworld.html>.
-
-* * *
-
-## Docker setup
-
-ABCg can be built in a [Docker](https://www.docker.com/) container. The Dockerfile provided is based on Ubuntu 22.04 and includes Emscripten.
-
-1.  Create the Docker image (`abcg`):
-
-        sudo docker build -t abcg .
-
-2.  Create the container (`abcg_container`):
-
-        sudo docker create -it \
-          -p 8080:8080 \
-          -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-          -e DISPLAY \
-          --name abcg_container abcg
-
-3.  Start the container:
-
-        sudo docker start -ai abcg_container
-
-    On NVIDIA GPUs, install the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker) to allow the container to use the host's NVIDIA driver and X server. Expose the X server with `sudo xhost +local:root` before starting the container.
-
-* * *
-
-## License
-
-ABCg is licensed under the MIT License. See [LICENSE](https://github.com/hbatagelo/abcg/blob/main/LICENSE) for more information.
+- Utilizou-se a classe [ctime](https://learn.microsoft.com/pt-br/cpp/atl-mfc-shared/reference/ctime-class?view=msvc-170) para controle de tempo entre as passagens de estado do jogo.
