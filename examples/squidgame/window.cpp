@@ -7,7 +7,6 @@ void Window::onCreate() {
   if (m_font == nullptr) {
     throw abcg::RuntimeError{"Cannot load font file"};
   }
-  generateRandomAnswer();
   startGame();
 }
 
@@ -68,9 +67,8 @@ void Window::onPaintUI() {
 
     ImGui::Spacing();
 
-    //static text showing the level game
-    {
-      
+    //static text showing the answer game
+    { 
       std::string aaaaa = concatenation;
       // Center text
       ImGui::SetCursorPosX(
@@ -81,7 +79,7 @@ void Window::onPaintUI() {
 
     ImGui::Spacing();
 
-    //static text showing the level game
+    //static text showing the history game
     {
       std::string history1 = "Cada nível é um passo que você escolhe andar na ponte.";
       // Center text
@@ -93,7 +91,7 @@ void Window::onPaintUI() {
 
     ImGui::Spacing();
 
-    //static text showing the level game
+    //static text showing the continue of the history game
     {
       std::string history2 ="Cuidado para não escolher o lado errado e acabar caindo";
       // Center text
@@ -176,9 +174,10 @@ void Window::onPaintUI() {
             // Button text is ch followed by an ID in the format ##ij
             auto buttonText{fmt::format("{}##{}{}", ch, i, j)};
             if (ImGui::Button(buttonText.c_str(), ImVec2(-1, buttonHeight))) {
-              if (m_gameState == GameState::Play || m_gameState == GameState::Played) {
+              if (m_gameState == GameState::Play && ch == ' ') {
                 m_board.at(offset) = 'X';
-                checkIfAnswerIsCorrect();
+                
+                m_playerChoice = j == 0 ? PlayerChoice::Left : PlayerChoice::Right;                
               }
             }
           }
@@ -217,19 +216,26 @@ void Window::generateRandomAnswer(){
 
 
 bool Window::checkIfAnswerIsCorrect() {
-  for (auto const j : iter::range(c_N)) {
-    return j == m_answers[m_gameLevel];
+  if (m_playerChoice == PlayerChoice::Left && m_answers[m_gameLevel] == 0){
+    return true;
+  } else if (m_playerChoice == PlayerChoice::Left && m_answers[m_gameLevel] == 1) {
+    return false;
+  } else if (m_playerChoice == PlayerChoice::Right && m_answers[m_gameLevel] == 0) {
+    return false;
+  } else if (m_playerChoice == PlayerChoice::Right && m_answers[m_gameLevel] == 1) {
+    return true;
   }
 }
 
 void Window::resetGame() {
   m_board.fill('\0');
   m_gameLevel = 0;
+  m_playerChoice = PlayerChoice::NotPlayed;
   m_futureGameState = GameState::Play;
 }
 
 void Window::restartForPlayer() {
-  if (m_gameLevel<last_level){
+  if (m_gameLevel<last_level-1){
     m_board.fill('\0');
     m_gameLevel++;
     m_futureGameState = GameState::Play;
@@ -239,6 +245,8 @@ void Window::restartForPlayer() {
 }
 
 void Window::startGame() {
+  m_gameState = GameState::StartGame;
+  m_playerChoice = PlayerChoice::NotPlayed;
   m_board.fill('\0');
   m_gameLevel = 0;
   generateRandomAnswer();
@@ -258,6 +266,8 @@ void Window:: played(){
   } else {
     m_futureGameState = GameState::Failed;
   }
+
+  m_playerChoice = PlayerChoice::NotPlayed;
 }
 
 void Window::failed() {

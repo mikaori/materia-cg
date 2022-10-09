@@ -19,7 +19,7 @@ private:
   int m_gameLevel{0};
   int m_answers[10];
 
-  enum class GameState { Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame };
+  enum class GameState { Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame, StartGame};
   enum class PlayerChoice { Left, Right, NotPlayed };
   GameState m_gameState;
   GameState m_futureGameState;
