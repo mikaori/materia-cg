@@ -136,7 +136,7 @@ void Window::onPaintUI() {
           break;
         case GameState::RestartForPlayer:
           if (std::time(0) - m_clickedButtonTime == 0){
-            text = "You hit!";
+            text = "YOU HIT! O/";
           } else if (std::time(0) - m_clickedButtonTime == 1){
             text = "Try to pass the next level!";
           }
