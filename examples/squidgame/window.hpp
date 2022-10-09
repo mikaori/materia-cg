@@ -13,11 +13,12 @@ private:
   static int const c_N{2};
   static int const m_N{2};
   static int const last_level{5};
-  std::string concatenation;
-
+  std::string concatenation; 
 
   int m_gameLevel{0};
   int m_answers[10];
+  int m_playerLife;
+  time_t m_clickedButtonTime;
 
   enum class GameState { Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame, StartGame};
   enum class PlayerChoice { Left, Right, NotPlayed };
@@ -39,6 +40,7 @@ private:
   void failed();
   void play();
   void played();
+  void lost();
 };
 
 #endif

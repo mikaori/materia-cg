@@ -1,4 +1,6 @@
 #include "window.hpp"
+#include<ctime>
+#include <string>
 
 void Window::onCreate() {
   auto const filename{abcg::Application::getAssetsPath() +
@@ -12,7 +14,7 @@ void Window::onCreate() {
 
 void Window::onPaintUI() {
 
-  // Processamento dos estados
+  // States processing
   switch (m_gameState) {
       case GameState::Play:
         play();
@@ -27,7 +29,10 @@ void Window::onPaintUI() {
        
         break;
       case GameState::Lost:
-       
+        lost();
+        break;
+      case GameState::StartGame:
+
         break;
       case GameState::RestartForPlayer:
         restartForPlayer();
@@ -68,20 +73,18 @@ void Window::onPaintUI() {
     ImGui::Spacing();
 
     //static text showing the answer game
-    { 
-      std::string aaaaa = concatenation;
-      // Center text
-      ImGui::SetCursorPosX(
-          (appWindowWidth - ImGui::CalcTextSize(aaaaa.c_str()).x) / 2);
-      ImGui::Text("%s", aaaaa.c_str());
-      ImGui::Spacing();
-    }
-
-    ImGui::Spacing();
+    // { 
+    //   std::string aaaaa = concatenation;
+    //   // Center text
+    //   ImGui::SetCursorPosX(
+    //       (appWindowWidth - ImGui::CalcTextSize(aaaaa.c_str()).x) / 2);
+    //   ImGui::Text("%s", aaaaa.c_str());
+    //   ImGui::Spacing();
+    // }
 
     //static text showing the history game
     {
-      std::string history1 = "Cada nível é um passo que você escolhe andar na ponte.";
+      std::string history1 = "Each level is a step you choose to walk on the glass bridge.";
       // Center text
       ImGui::SetCursorPosX(
           (appWindowWidth - ImGui::CalcTextSize(history1.c_str()).x) / 2);
@@ -93,7 +96,7 @@ void Window::onPaintUI() {
 
     //static text showing the continue of the history game
     {
-      std::string history2 ="Cuidado para não escolher o lado errado e acabar caindo";
+      std::string history2 ="Be careful not to choose the wrong side and end up falling...";
       // Center text
       ImGui::SetCursorPosX(
           (appWindowWidth - ImGui::CalcTextSize(history2.c_str()).x) / 2);
@@ -102,47 +105,53 @@ void Window::onPaintUI() {
     }
 
     ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
 
     //static text showing the level game
     {
-      auto level = fmt::format("Level {}", std::to_string(m_gameLevel));
+      auto gameInfo = fmt::format("Level {} - Life {}", std::to_string(m_gameLevel), std::to_string(m_playerLife));
       // Center text
-      ImGui::SetCursorPosX(
-          (appWindowWidth - ImGui::CalcTextSize(level.c_str()).x) / 2);
-      ImGui::Text("%s", level.c_str());
+      ImGui::TextColored(ImVec4(1,0,0,1), gameInfo.c_str());
       ImGui::Spacing();
     }
 
     ImGui::Spacing();
-    ImGui::Spacing();
 
-    // Static text showing current turn or win/draw messages
+    // Static text showing current state messages
     {
       std::string text;
       switch (m_gameState) {
-      case GameState::Play:
-        text = "Choose your left ou right to live or not...";
-        break;
-      case GameState::Played:
-        text = "You hit! Try to pass the next step!";
-        break;
-      case GameState::Failed:
-        text = "Oh no, you failed! We have to start over!";
-        break;
-      case GameState::Win:
-        text = "Congratulations! You Win!";
-        break;
-      case GameState::Lost:
-        text = "You looooooost :(";
-        break;
-      }
+        case GameState::Play:
+          text = "Choose your left ou right to live or not...";
+          break;
+        case GameState::Played:
+          break;
+        case GameState::Failed:
+            text = "Oh no, you FAILED! You lost a life </3";
+          break;
+        case GameState::Win:
+          text = "YOU WIN! $$$$$ Now you're rich $$$$$";
+          break;
+        case GameState::Lost:
+          text = "You LOST! X_X Closing the game because you fell off the bridge and died.";
+          break;
+        case GameState::RestartForPlayer:
+          if (std::time(0) - m_clickedButtonTime == 0){
+            text = "You hit!";
+          } else if (std::time(0) - m_clickedButtonTime == 1){
+            text = "Try to pass the next level!";
+          }
+          break;
+        case GameState::ResetGame:
+          text = "We have to start over!";
+          break;
+        case GameState::StartGame:
+          break;
+      } 
+
       // Center text
       ImGui::SetCursorPosX(
           (appWindowWidth - ImGui::CalcTextSize(text.c_str()).x) / 2);
-      ImGui::Text("%s", text.c_str());
+      ImGui::TextColored(ImVec4(1,0,0,1), text.c_str());
       ImGui::Spacing();
     }
 
@@ -176,7 +185,7 @@ void Window::onPaintUI() {
             if (ImGui::Button(buttonText.c_str(), ImVec2(-1, buttonHeight))) {
               if (m_gameState == GameState::Play && ch == ' ') {
                 m_board.at(offset) = 'X';
-                
+                m_clickedButtonTime = std::time(0);
                 m_playerChoice = j == 0 ? PlayerChoice::Left : PlayerChoice::Right;                
               }
             }
@@ -199,6 +208,7 @@ void Window::onPaintUI() {
 
     ImGui::End();
   }
+
   m_gameState =  m_futureGameState; 
 }
 
@@ -228,19 +238,25 @@ bool Window::checkIfAnswerIsCorrect() {
 }
 
 void Window::resetGame() {
-  m_board.fill('\0');
-  m_gameLevel = 0;
-  m_playerChoice = PlayerChoice::NotPlayed;
-  m_futureGameState = GameState::Play;
+  if(std::time(0) - m_clickedButtonTime > 4){
+    m_board.fill('\0');
+    m_gameLevel = 0;
+    m_playerChoice = PlayerChoice::NotPlayed;
+    m_futureGameState = GameState::Play;
+  }
 }
 
 void Window::restartForPlayer() {
-  if (m_gameLevel<last_level-1){
-    m_board.fill('\0');
-    m_gameLevel++;
-    m_futureGameState = GameState::Play;
-  } else{
-    m_futureGameState = GameState::Win;
+  if(std::time(0) - m_clickedButtonTime > 2){
+    if (m_gameLevel<last_level-1){
+      m_board.fill('\0');
+      m_gameLevel++;
+      m_futureGameState = GameState::Play;
+    } else{
+      m_futureGameState = GameState::Win;
+    }
+  }else{
+    m_futureGameState = GameState::RestartForPlayer;
   }
 }
 
@@ -250,6 +266,7 @@ void Window::startGame() {
   m_board.fill('\0');
   m_gameLevel = 0;
   generateRandomAnswer();
+  m_playerLife = 3;
 
   m_futureGameState = GameState::Play;
 }
@@ -261,19 +278,22 @@ void Window::play(){
 }
 
 void Window:: played(){
-  if (checkIfAnswerIsCorrect()){
-    m_futureGameState = GameState::RestartForPlayer;
-  } else {
-    m_futureGameState = GameState::Failed;
-  }
+  m_futureGameState = checkIfAnswerIsCorrect() ? GameState::RestartForPlayer : GameState::Failed;
 
   m_playerChoice = PlayerChoice::NotPlayed;
 }
 
 void Window::failed() {
-  /* if(vida == 0 ){
-        m_futureGameState = GameState::Lost;
-      }else{
-        m_futureGameState = GameState::ResetGame;
-      }*/
+  if(std::time(0) - m_clickedButtonTime > 2){
+    m_playerLife--;
+    m_futureGameState = m_playerLife > 0 ? GameState::ResetGame : GameState::Lost;
+  } else {
+    m_futureGameState = GameState::Failed;
+  }
+}
+
+void Window::lost(){
+  if(std::time(0) - m_clickedButtonTime > 8){
+    exit(0);
+  }
 }
