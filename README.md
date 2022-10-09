@@ -6,6 +6,8 @@
 
 ## SquidGame
 
+[LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/squidgame/) 
+
 **Como é a aplicação?**
 
 A aplicação é uma representação da Ponte de Crital, este jogo é apresentado na série Round 6 como o quinto desafio dos participantes. 
@@ -43,14 +45,17 @@ Portanto, temos quatro casos:
 *Implementação do código*
 - A estrutura do código foi implementada com base em máquina de estados. Dessa forma, tem-se oito estados: Play, Played, Failed, Win, Lost, RestartForPlayer, ResetGame, StartGame.
 
-        1. StartGame: Inicia o jogo, seta os parâmetros defaults necessários e reseta os botões para o jogador iniciar o jogo do zero.
-        2. Play: Verifica se o jogador clicou em algum dos botões.
-        3. Played: Verifica se o jogador acertou a resposta.
-        4. Failed: Verifica se o jogador ainda possui vida para tentar jogar novamente.
-        5. RestartForPlayer: Verifica se o jogador possui mais um nível para jogar ou se conseguiu passar por todos os níveis.
-        6. ResetGame: Reseta o jogo durante a partida atual. Ou seja, se o jogador ainda possui vida para jogar, este estado atua para resetar o jogo para ele conseguir jogar novamente.
-        7. Win: Jogador ganhou a partida.
-        8. Lost: Jogador perdeu a partida. A aplicação foi programada para encerrar sozinha nesse estado. 
+        1. **StartGame:** Inicia o jogo, seta os parâmetros defaults necessários e reseta os botões para o 
+           jogador iniciar o jogo do zero.
+        2. **Play:** Verifica se o jogador clicou em algum dos botões.
+        3. **Played:** Verifica se o jogador acertou a resposta.
+        4. **Failed:** Verifica se o jogador ainda possui vida para tentar jogar novamente.
+        5. **RestartForPlayer:** Verifica se o jogador possui mais um nível para jogar ou se conseguiu passar 
+           por todos os níveis.
+        6. **ResetGame:** Reseta o jogo durante a partida atual. Ou seja, se o jogador ainda possui vida para
+           jogar, este estado atua para resetar o jogo para ele conseguir jogar novamente.
+        7. **Win:** Jogador ganhou a partida.
+        8. **Lost:** Jogador perdeu a partida. A aplicação foi programada para encerrar sozinha nesse estado. 
 
 - A interação do usuário ocorre por meio de interações com o botão. Quando o usuário seleciona um dos botões o jogo verifica se o usuário selecionou o botão da esquerda ou da direita para posteriormente realizar a checagem da resposta correta. 
 
