@@ -8,7 +8,7 @@
 
 #include "gamedata.hpp"
 
-class StarLayers {
+class Flowers {
 public:
   void create(GLuint program, int quantity);
   void paint();
@@ -28,7 +28,7 @@ private:
     glm::vec2 m_translation{};
   };
 
-  std::array<StarLayer, 5> m_starLayers;
+  std::array<StarLayer, 5> m_flowers;
 
   std::default_random_engine m_randomEngine;
 };

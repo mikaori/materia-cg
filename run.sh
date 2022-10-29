@@ -1,2 +1,2 @@
 ./build.sh
-/home/mikaori/ufabc/cg/materia-cg/build/bin/asteroids2/asteroids2
+/home/mikaori/ufabc/cg/materia-cg/build/bin/dogsimulate/dogsimulate

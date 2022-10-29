@@ -1,6 +1,6 @@
-#include "starlayers.hpp"
+#include "flowers.hpp"
 
-void StarLayers::create(GLuint program, int quantity) {
+void Flowers::create(GLuint program, int quantity) {
   destroy();
 
   // Initialize pseudorandom number generator and distributions
@@ -21,7 +21,7 @@ void StarLayers::create(GLuint program, int quantity) {
       abcg::glGetAttribLocation(m_program, "inPosition")};
   auto const colorAttribute{abcg::glGetAttribLocation(m_program, "inColor")};
 
-  for (auto &&[index, layer] : iter::enumerate(m_starLayers)) {
+  for (auto &&[index, layer] : iter::enumerate(m_flowers)) {
     // Create data for the stars of this layer
     layer.m_pointSize = 10.0f / (1.0f + index);
     layer.m_quantity = quantity * (gsl::narrow<int>(index) + 1);
@@ -61,13 +61,13 @@ void StarLayers::create(GLuint program, int quantity) {
   }
 }
 
-void StarLayers::paint() {
+void Flowers::paint() {
   abcg::glUseProgram(m_program);
 
   abcg::glEnable(GL_BLEND);
   abcg::glBlendFunc(GL_ONE, GL_ONE);
 
-  for (auto const &layer : m_starLayers) {
+  for (auto const &layer : m_flowers) {
     abcg::glBindVertexArray(layer.m_VAO);
     abcg::glUniform1f(m_pointSizeLoc, layer.m_pointSize);
 
@@ -84,15 +84,15 @@ void StarLayers::paint() {
   abcg::glUseProgram(0);
 }
 
-void StarLayers::destroy() {
-  for (auto &layer : m_starLayers) {
+void Flowers::destroy() {
+  for (auto &layer : m_flowers) {
     abcg::glDeleteBuffers(1, &layer.m_VBO);
     abcg::glDeleteVertexArrays(1, &layer.m_VAO);
   }
 }
 
-//void StarLayers::update(const Ship &ship, float deltaTime) {
-  //for (auto &&[index, layer] : iter::enumerate(m_starLayers)) {
+//void Flowers::update(const Ship &ship, float deltaTime) {
+  //for (auto &&[index, layer] : iter::enumerate(m_flowers)) {
     //auto const layerSpeedScale{1.0f / (index + 2.0f)};
     //layer.m_translation -= ship.m_velocity * deltaTime * layerSpeedScale;
 

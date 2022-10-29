@@ -7,7 +7,7 @@
 
 #include "balls.hpp"
 #include "dog.hpp"
-#include "starlayers.hpp"
+#include "flowers.hpp"
 
 class Window : public abcg::OpenGLWindow {
 protected:
@@ -28,7 +28,7 @@ private:
   GameData m_gameData;
 
   Dog m_dog;
-  StarLayers m_starLayers;
+  Flowers m_flowers;
   Balls m_balls;
 
   abcg::Timer m_restartWaitTimer;

@@ -68,7 +68,7 @@ void Window::onCreate() {
 void Window::restart() {
   m_gameData.m_state = State::Playing;
 
-  m_starLayers.create(m_starsProgram, 25);
+  m_flowers.create(m_starsProgram, 25);
   m_dog.create(m_objectsProgram);
   m_balls.create(m_objectsProgram, 10);
 }
@@ -86,7 +86,7 @@ void Window::onUpdate() {
   m_dog.update(m_gameData, deltaTime);
   // m_balls.update(m_dog, deltaTime);
 
-  // m_starLayers.update(m_dog, deltaTime);
+  // m_flowers.update(m_dog, deltaTime);
 }
 
 void Window::onPaint() {
@@ -95,7 +95,7 @@ void Window::onPaint() {
   abcg::glClearColor(m_clearColor.at(0), m_clearColor.at(1), m_clearColor.at(2),
                      m_clearColor.at(3));
 
-  m_starLayers.paint();
+  m_flowers.paint();
   m_balls.paint();
   m_dog.paint(m_gameData);
 }
@@ -137,6 +137,6 @@ void Window::onDestroy() {
   abcg::glDeleteProgram(m_objectsProgram);
 
   m_dog.destroy();
-  m_starLayers.destroy();
+  m_flowers.destroy();
   m_balls.destroy();
 }
