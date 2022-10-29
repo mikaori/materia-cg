@@ -7,7 +7,7 @@
 
 #include "balls.hpp"
 #include "dog.hpp"
-#include "basket.hpp"
+#include "starlayers.hpp"
 
 class Window : public abcg::OpenGLWindow {
 protected:
@@ -22,14 +22,14 @@ protected:
 private:
   glm::ivec2 m_viewportSize{};
 
-  // GLuint m_starsProgram{};
+  GLuint m_starsProgram{};
   GLuint m_objectsProgram{};
 
   GameData m_gameData;
 
-  Balls m_balls;
-  Basket m_basket;
   Dog m_dog;
+  StarLayers m_starLayers;
+  Balls m_balls;
 
   abcg::Timer m_restartWaitTimer;
 
@@ -37,9 +37,9 @@ private:
 
   std::default_random_engine m_randomEngine;
 
+  std::array<float, 4> m_clearColor{0.2f, 0.8f, 0.2f, 1.0f};
+
   void restart();
-  void checkCollisions();
-  void checkEndCondition();
 };
 
 #endif

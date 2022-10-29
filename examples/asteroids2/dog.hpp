@@ -1,11 +1,11 @@
-#ifndef SHIP_HPP_
-#define SHIP_HPP_
+#ifndef DOG_HPP_
+#define DOG_HPP_
 
 #include "abcgOpenGL.hpp"
 
 #include "gamedata.hpp"
 
-class Ship {
+class Dog {
 public:
   void create(GLuint program);
   void paint(GameData const &gameData);

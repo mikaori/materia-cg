@@ -22,7 +22,7 @@ void StarLayers::create(GLuint program, int quantity) {
   auto const colorAttribute{abcg::glGetAttribLocation(m_program, "inColor")};
 
   for (auto &&[index, layer] : iter::enumerate(m_starLayers)) {
-    // Create geometry data for the stars of this layer
+    // Create data for the stars of this layer
     layer.m_pointSize = 10.0f / (1.0f + index);
     layer.m_quantity = quantity * (gsl::narrow<int>(index) + 1);
     layer.m_translation = {};
@@ -71,15 +71,11 @@ void StarLayers::paint() {
     abcg::glBindVertexArray(layer.m_VAO);
     abcg::glUniform1f(m_pointSizeLoc, layer.m_pointSize);
 
-    for (auto const i : {-2, 0, 2}) {
-      for (auto const j : {-2, 0, 2}) {
-        abcg::glUniform2f(m_translationLoc, layer.m_translation.x + j,
-                          layer.m_translation.y + i);
+ 
+    abcg::glUniform2f(m_translationLoc, layer.m_translation.x, layer.m_translation.y);
 
-        abcg::glDrawArrays(GL_POINTS, 0, layer.m_quantity);
-      }
-    }
-
+    abcg::glDrawArrays(GL_POINTS, 0, layer.m_quantity);
+      
     abcg::glBindVertexArray(0);
   }
 
@@ -95,19 +91,18 @@ void StarLayers::destroy() {
   }
 }
 
-void StarLayers::update(const Ship &ship, float deltaTime) {
-  for (auto &&[index, layer] : iter::enumerate(m_starLayers)) {
-    auto const layerSpeedScale{1.0f / (index + 2.0f)};
-    layer.m_translation -= ship.m_velocity * deltaTime * layerSpeedScale;
+//void StarLayers::update(const Ship &ship, float deltaTime) {
+  //for (auto &&[index, layer] : iter::enumerate(m_starLayers)) {
+    //auto const layerSpeedScale{1.0f / (index + 2.0f)};
+    //layer.m_translation -= ship.m_velocity * deltaTime * layerSpeedScale;
 
     // Wrap-around
-    if (layer.m_translation.x < -1.0f)
-      layer.m_translation.x += 2.0f;
-    if (layer.m_translation.x > +1.0f)
-      layer.m_translation.x -= 2.0f;
-    if (layer.m_translation.y < -1.0f)
-      layer.m_translation.y += 2.0f;
-    if (layer.m_translation.y > +1.0f)
-      layer.m_translation.y -= 2.0f;
-  }
-}
+    //if (layer.m_translation.x < -1.0f)
+    //  layer.m_translation.x += 2.0f;
+    //if (layer.m_translation.x > +1.0f)
+      //layer.m_translation.x -= 2.0f;
+    //if (layer.m_translation.y < -1.0f)
+      //layer.m_translation.y += 2.0f;
+    //if (layer.m_translation.y > +1.0f)
+      //layer.m_translation.y -= 2.0f;
+  //}

@@ -16,7 +16,7 @@ void Ship::create(GLuint program) {
 
   // Reset ship attributes
   m_rotation = 0.0f;
-  m_translation = glm::vec2(0);
+  m_translation = glm::vec2(1100);
   m_velocity = glm::vec2(0);
 
   // clang-format off
