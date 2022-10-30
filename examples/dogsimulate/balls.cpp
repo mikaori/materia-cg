@@ -25,7 +25,7 @@ void Balls::create(GLuint program, int quantity) {
     // Make sure the ball won't collide with the dog
     do {
       ball.m_translation = {m_randomDist(m_randomEngine),
-                                m_randomDist(m_randomEngine)};
+                            m_randomDist(m_randomEngine)};
     } while (glm::length(ball.m_translation) < 0.01f);
   }
 }
@@ -34,20 +34,22 @@ void Balls::paint() {
   abcg::glUseProgram(m_program);
 
   for (auto const &ball : m_balls) {
-    abcg::glBindVertexArray(ball.m_VAO);
-    abcg::glUniform1f(m_scaleLoc, ball.m_scale);
-    abcg::glUniform4fv(m_colorLoc, 1, &ball.m_color.r);
+    if (!ball.m_catch) {
+      abcg::glBindVertexArray(ball.m_VAO);
+      abcg::glUniform1f(m_scaleLoc, ball.m_scale);
+      abcg::glUniform4fv(m_colorLoc, 1, &ball.m_color.r);
 
-    for (auto i : {-2, 0, 2}) {
-      for (auto j : {-2, 0, 2}) {
-        abcg::glUniform2f(m_translationLoc, ball.m_translation.x + j,
-                          ball.m_translation.y + i);
+      for (auto i : {-2, 0, 2}) {
+        for (auto j : {-2, 0, 2}) {
+          abcg::glUniform2f(m_translationLoc, ball.m_translation.x + j,
+                            ball.m_translation.y + i);
 
-        abcg::glDrawArrays(GL_TRIANGLE_FAN, 0, ball.m_polygonSides + 2);
+          abcg::glDrawArrays(GL_TRIANGLE_FAN, 0, ball.m_polygonSides + 2);
+        }
       }
-    }
 
-    abcg::glBindVertexArray(0);
+      abcg::glBindVertexArray(0);
+    }
   }
 
   abcg::glUseProgram(0);
@@ -66,9 +68,16 @@ Balls::Ball Balls::makeBall(glm::vec2 translation) {
   auto &re{m_randomEngine}; // Shortcut
 
   // Get a random color (actually, a grayscale)
-  std::uniform_real_distribution randomIntensity(0.5f, 1.0f);
-  ball.m_color = glm::vec4(randomIntensity(re));
-
+  std::uniform_real_distribution randomIntensity(0.0f, 1.0f);
+  
+  // Select the color of ball
+  auto const colorRandom{randomIntensity(re)};
+  if( colorRandom < 0.5f ){
+    ball.m_color = glm::vec4(1,0,0, 1);
+  }else{
+    ball.m_color = glm::vec4(0,0,1, 1);
+  }
+  
   ball.m_color.a = 1.0f;
   ball.m_scale = 0.05f;
   ball.m_translation = translation;
@@ -108,4 +117,13 @@ Balls::Ball Balls::makeBall(glm::vec2 translation) {
   abcg::glBindVertexArray(0);
 
   return ball;
+}
+
+bool Balls::isAllBallsCatch() {
+  for (auto const &ball : m_balls) {
+    if (!ball.m_catch) {
+      return false;
+    }
+  }
+  return true;
 }

@@ -21,7 +21,15 @@ void Dog::create(GLuint program) {
 
   // clang-format off
   std::array positions{
-      glm::vec2{-16.0f, +12.0f}, glm::vec2{+16.0f, +12.0f}, glm::vec2{+16.0f, -12.0f}
+      glm::vec2{-08.0f,  00.0f}, glm::vec2{ 00.0f,  00.0f},  glm::vec2{ 00.0f, -08.0f}, glm::vec2{-08.0f, -08.0f},
+      glm::vec2{-04.0f, -08.0f}, glm::vec2{-04.0f, -12.0f},
+      glm::vec2{-08.0f, -12.0f}, glm::vec2{-12.0f, +04.0f},
+      glm::vec2{-12.0f,  00.0f}, glm::vec2{+08.0f,  00.0f},
+      glm::vec2{+08.0f, -08.0f}, glm::vec2{+08.0f, -12.0f},
+      glm::vec2{+04.0f, -08.0f}, glm::vec2{+04.0f, -12.0f},
+      glm::vec2{+12.0f,  00.0f}, glm::vec2{+12.0f, +04.0f},
+      glm::vec2{+08.0f, +04.0f}, glm::vec2{+08.0f, +08.0f},
+      glm::vec2{+04.0f, +08.0f}, glm::vec2{ 00.0f, +08.0f}
       };
 
   // Normalize
@@ -29,7 +37,19 @@ void Dog::create(GLuint program) {
     position /= glm::vec2{15.5f, 15.5f};
   }
 
-  std::array const indices{0, 1, 2};
+  std::array const indices{
+                            0, 3, 10,
+                            0, 9, 10,
+                            3, 4, 5,
+                            3, 5, 6,
+                            0, 7, 8,
+                            10, 11, 12,
+                            11, 12, 13,
+                            9, 14, 15,
+                            9, 15, 16,
+                            9, 18, 20,
+                            2, 9, 20,  
+                            };
   // clang-format on
 
   // Generate VBO
@@ -77,7 +97,7 @@ void Dog::paint(const GameData &gameData) {
   abcg::glBindVertexArray(m_VAO);
 
   abcg::glUniform1f(m_scaleLoc, m_scale);
-  //abcg::glUniform1f(m_rotationLoc, m_rotation);
+  // abcg::glUniform1f(m_rotationLoc, m_rotation);
   abcg::glUniform2fv(m_translationLoc, 1, &m_translation.x);
 
   abcg::glUniform4fv(m_colorLoc, 1, &m_color.r);

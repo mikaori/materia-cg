@@ -3,8 +3,8 @@
 
 #include <bitset>
 
-enum class Input { Right, Left, Down, Up, Fire };
-enum class State { Playing, GameOver, Win };
+enum class Input { Right, Left, Down, Up };
+enum class State { Playing, End };
 
 struct GameData {
   State m_state{State::Playing};

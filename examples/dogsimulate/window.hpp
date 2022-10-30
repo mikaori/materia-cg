@@ -30,6 +30,7 @@ private:
   Dog m_dog;
   Flowers m_flowers;
   Balls m_balls;
+  int m_ballsQuantity{20};
 
   abcg::Timer m_restartWaitTimer;
 
@@ -37,9 +38,11 @@ private:
 
   std::default_random_engine m_randomEngine;
 
-  std::array<float, 4> m_clearColor{0.2f, 0.8f, 0.2f, 1.0f};
+  std::array<float, 4> m_clearColor{0.0f, 0.7f, 0.0f, 1.0f};
 
   void restart();
+  void checkCollisions();
+  void checkEndCondition();
 };
 
 #endif

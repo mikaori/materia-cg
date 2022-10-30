@@ -23,12 +23,13 @@ public:
     int m_polygonSides{20};
     float m_scale{};
     glm::vec2 m_translation{};
-    bool m_hit{};
+    bool m_catch{};
   };
 
   std::list<Ball> m_balls;
 
   Ball makeBall(glm::vec2 translation = {});
+  bool isAllBallsCatch();
 
 private:
   GLuint m_program{};
@@ -37,7 +38,7 @@ private:
   GLint m_scaleLoc{};
 
   std::default_random_engine m_randomEngine;
-  std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
+  std::uniform_real_distribution<float> m_randomDist{-0.9f, 0.9f};
 };
 
 #endif

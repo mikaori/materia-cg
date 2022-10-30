@@ -3,8 +3,6 @@
 void Window::onEvent(SDL_Event const &event) {
   // Keyboard events
   if (event.type == SDL_KEYDOWN) {
-    if (event.key.keysym.sym == SDLK_SPACE)
-      m_gameData.m_input.set(gsl::narrow<size_t>(Input::Fire));
     if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
       m_gameData.m_input.set(gsl::narrow<size_t>(Input::Up));
     if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
@@ -15,8 +13,6 @@ void Window::onEvent(SDL_Event const &event) {
       m_gameData.m_input.set(gsl::narrow<size_t>(Input::Right));
   }
   if (event.type == SDL_KEYUP) {
-    if (event.key.keysym.sym == SDLK_SPACE)
-      m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Fire));
     if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
       m_gameData.m_input.reset(gsl::narrow<size_t>(Input::Up));
     if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
@@ -33,7 +29,7 @@ void Window::onCreate() {
 
   // Load a new font
   auto const filename{assetsPath + "Inconsolata-Medium.ttf"};
-  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.c_str(), 30.0f);
   if (m_font == nullptr) {
     throw abcg::RuntimeError("Cannot load font file");
   }
@@ -70,7 +66,7 @@ void Window::restart() {
 
   m_flowers.create(m_starsProgram, 25);
   m_dog.create(m_objectsProgram);
-  m_balls.create(m_objectsProgram, 10);
+  m_balls.create(m_objectsProgram, m_ballsQuantity);
 }
 
 void Window::onUpdate() {
@@ -87,6 +83,11 @@ void Window::onUpdate() {
   // m_balls.update(m_dog, deltaTime);
 
   // m_flowers.update(m_dog, deltaTime);
+
+  if (m_gameData.m_state == State::Playing) {
+    checkCollisions();
+    checkEndCondition();
+  }
 }
 
 void Window::onPaint() {
@@ -104,7 +105,7 @@ void Window::onPaintUI() {
   abcg::OpenGLWindow::onPaintUI();
 
   {
-    auto const size{ImVec2(300, 85)};
+    auto const size{ImVec2(500, 165)};
     auto const position{ImVec2((m_viewportSize.x - size.x) / 2.0f,
                                (m_viewportSize.y - size.y) / 2.0f)};
     ImGui::SetNextWindowPos(position);
@@ -115,10 +116,8 @@ void Window::onPaintUI() {
     ImGui::Begin(" ", nullptr, flags);
     ImGui::PushFont(m_font);
 
-    if (m_gameData.m_state == State::GameOver) {
-      ImGui::Text("Game Over!");
-    } else if (m_gameData.m_state == State::Win) {
-      ImGui::Text("*You Win!*");
+    if (m_gameData.m_state == State::End) {
+      ImGui::Text("You got all balls!\nWof wof wof woooof");
     }
 
     ImGui::PopFont();
@@ -139,4 +138,25 @@ void Window::onDestroy() {
   m_dog.destroy();
   m_flowers.destroy();
   m_balls.destroy();
+}
+
+void Window::checkCollisions() {
+  // Check if the dog catch a ball
+  for (auto &ball : m_balls.m_balls) {
+    auto const ballTranslation{ball.m_translation};
+    auto const distance{glm::distance(m_dog.m_translation, ballTranslation)};
+
+    if (distance < m_dog.m_scale * 0.9f + ball.m_scale * 0.85f) {
+      ball.m_catch = true;
+      // m_gameData.m_state = State::GameOver;
+      // m_restartWaitTimer.restart();
+    }
+  }
+}
+
+void Window::checkEndCondition() {
+  if (m_balls.isAllBallsCatch()) {
+    m_gameData.m_state = State::End;
+    m_restartWaitTimer.restart();
+  }
 }
