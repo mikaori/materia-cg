@@ -21,15 +21,18 @@ void Dog::create(GLuint program) {
 
   // clang-format off
   std::array positions{
-      glm::vec2{-08.0f,  00.0f}, glm::vec2{ 00.0f,  00.0f},  glm::vec2{ 00.0f, -08.0f}, glm::vec2{-08.0f, -08.0f},
-      glm::vec2{-04.0f, -08.0f}, glm::vec2{-04.0f, -12.0f},
-      glm::vec2{-08.0f, -12.0f}, glm::vec2{-12.0f, +04.0f},
-      glm::vec2{-12.0f,  00.0f}, glm::vec2{+08.0f,  00.0f},
-      glm::vec2{+08.0f, -08.0f}, glm::vec2{+08.0f, -12.0f},
-      glm::vec2{+04.0f, -08.0f}, glm::vec2{+04.0f, -12.0f},
+      glm::vec2{-08.0f,  00.0f}, glm::vec2{+08.0f,  00.0f},  
+      glm::vec2{+08.0f, -08.0f}, glm::vec2{-08.0f, -08.0f},
+      glm::vec2{-04.0f, -12.0f}, glm::vec2{-08.0f, -12.0f},
+      glm::vec2{-04.0f, -08.0f}, glm::vec2{+04.0f, -08.0f},
+      glm::vec2{+04.0f, -12.0f}, glm::vec2{+08.0f, -12.0f},
+      glm::vec2{-12.0f,  00.0f}, glm::vec2{-12.0f, +04.0f},
       glm::vec2{+12.0f,  00.0f}, glm::vec2{+12.0f, +04.0f},
       glm::vec2{+08.0f, +04.0f}, glm::vec2{+08.0f, +08.0f},
-      glm::vec2{+04.0f, +08.0f}, glm::vec2{ 00.0f, +08.0f}
+      glm::vec2{+00.0f, +08.0f}, glm::vec2{ 00.0f,  00.0f},
+      glm::vec2{+06.0f, +08.0f}, glm::vec2{+06.0f, +12.0f},
+      glm::vec2{+04.0f, +08.0f}, glm::vec2{+02.0f, +08.0f},
+      glm::vec2{+00.0f, +12.0f},
       };
 
   // Normalize
@@ -38,17 +41,19 @@ void Dog::create(GLuint program) {
   }
 
   std::array const indices{
-                            0, 3, 10,
-                            0, 9, 10,
+                            0, 1, 2,
+                            0, 2, 3,
                             3, 4, 5,
                             3, 5, 6,
-                            0, 7, 8,
-                            10, 11, 12,
-                            11, 12, 13,
-                            9, 14, 15,
-                            9, 15, 16,
-                            9, 18, 20,
-                            2, 9, 20,  
+                            7, 8, 9,
+                            2, 7, 9,
+                            0, 10, 11,
+                            1, 12, 13,
+                            1, 13, 14,
+                            1, 15, 16,
+                            1, 16, 17, 
+                            //18, 19, 20,
+                            16, 21, 22 
                             };
   // clang-format on
 
