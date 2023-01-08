@@ -1,2 +1,2 @@
 ./build.sh
-/home/mikaori/ufabc/cg/materia-cg/build/bin/dogsimulate/dogsimulate
+\ufabc\cg\abcg\build\bin\forestsimulate\forestsimulate
