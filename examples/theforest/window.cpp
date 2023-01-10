@@ -10,55 +10,24 @@ template <> struct std::hash<Vertex> {
   }
 };
 
-void Window::onEvent(SDL_Event const &event) {
-  if (event.type == SDL_KEYDOWN) {
-    if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
-      m_dollySpeed = 1.0f;
-    if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
-      m_dollySpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
-      m_panSpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
-      m_panSpeed = 1.0f;
-    if (event.key.keysym.sym == SDLK_q)
-      m_truckSpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_e)
-      m_truckSpeed = 1.0f;
-  }
-  if (event.type == SDL_KEYUP) {
-    if ((event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w) &&
-        m_dollySpeed > 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s) &&
-        m_dollySpeed < 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a) &&
-        m_panSpeed < 0)
-      m_panSpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_RIGHT ||
-         event.key.keysym.sym == SDLK_d) &&
-        m_panSpeed > 0)
-      m_panSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_q && m_truckSpeed < 0)
-      m_truckSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_e && m_truckSpeed > 0)
-      m_truckSpeed = 0.0f;
-  }
-}
-
 void Window::onCreate() {
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
   abcg::glClearColor(0, 0, 0, 1);
+
+  // Setup tree
+  for (auto &tree : m_tree) {
+    randomizeTree(tree);
+  }
 
   // Enable depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
 
   // Create program
   m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "lookat.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "theforest.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "lookat.frag",
+                                 {.source = assetsPath + "theforest.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
   m_ground.create(m_program);
@@ -106,6 +75,119 @@ void Window::onCreate() {
 
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
+}
+
+
+void Window::onPaint() {
+  // Clear color buffer and depth buffer
+  abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
+
+  abcg::glUseProgram(m_program);
+
+  // Set uniform variables for viewMatrix and projMatrix
+  // These matrices are used for every scene object
+  abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
+                           &m_camera.getViewMatrix()[0][0]);
+  abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
+                           &m_camera.getProjMatrix()[0][0]);
+
+  abcg::glBindVertexArray(m_VAO);
+
+  // Draw white bunny
+  // glm::mat4 model{1.0f};
+  // model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
+  // model = glm::scale(model, glm::vec3(0.5f));
+
+  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  // abcg::glUniform4f(m_colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+  //                      nullptr);
+
+  // Draw yellow bunny
+  // model = glm::mat4(1.0);
+  // model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
+  // model = glm::scale(model, glm::vec3(0.5f));
+
+  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
+  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+  //                      nullptr);
+
+  // Draw blue bunny
+  // model = glm::mat4(1.0);
+  // model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+  // model = glm::scale(model, glm::vec3(0.5f));
+
+  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  // abcg::glUniform4f(m_colorLocation, 0.0f, 0.8f, 1.0f, 1.0f);
+  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+  //                      nullptr);
+
+  // Draw red bunny
+  // model = glm::mat4(1.0);
+  // model = glm::scale(model, glm::vec3(0.5f));
+
+  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
+  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+  //                      nullptr);
+  
+
+  for (auto &tree : m_tree)
+    {
+        glm::mat4 model{1.0f};
+        model = glm::translate(model, tree.m_position);
+        model = glm::scale(model, glm::vec3(0.5f));
+
+        abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+        abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
+        abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+                     nullptr);
+
+    }
+    
+  abcg::glBindVertexArray(0);
+
+  // Draw ground
+  m_ground.paint();
+
+  abcg::glUseProgram(0);
+}
+
+void Window::randomizeTree(Tree &tree) {
+  // Random position: x and y in [-20, 20), z in [-100, 0)
+  std::uniform_real_distribution<float> distPosXZ(-10.0f, 10.0f);
+  //std::uniform_real_distribution<float> distPosY(-100.0f, 0.0f);
+  tree.m_position =
+      glm::vec3(distPosXZ(m_randomEngine), 0,
+                distPosXZ(m_randomEngine));
+}
+
+void Window::onPaintUI() { abcg::OpenGLWindow::onPaintUI(); }
+
+void Window::onResize(glm::ivec2 const &size) {
+  m_viewportSize = size;
+  m_camera.computeProjectionMatrix(size);
+}
+
+void Window::onDestroy() {
+  m_ground.destroy();
+
+  abcg::glDeleteProgram(m_program);
+  abcg::glDeleteBuffers(1, &m_EBO);
+  abcg::glDeleteBuffers(1, &m_VBO);
+  abcg::glDeleteVertexArrays(1, &m_VAO);
+}
+
+void Window::onUpdate() {
+  auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
+
+  // Update LookAt camera
+  m_camera.dolly(m_dollySpeed * deltaTime);
+  m_camera.truck(m_truckSpeed * deltaTime);
+  m_camera.pan(m_panSpeed * deltaTime);
 }
 
 void Window::loadModelFromFile(std::string_view path) {
@@ -160,91 +242,41 @@ void Window::loadModelFromFile(std::string_view path) {
   }
 }
 
-void Window::onPaint() {
-  // Clear color buffer and depth buffer
-  abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void Window::onEvent(SDL_Event const &event) {
 
-  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
+  if (event.type == SDL_KEYDOWN) {
+    if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
+      m_dollySpeed = 1.0f;
+    if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
+      m_dollySpeed = -1.0f;
+    if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
+      m_panSpeed = -1.0f;
+    if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
+      m_panSpeed = 1.0f;
+    if (event.key.keysym.sym == SDLK_q)
+      m_truckSpeed = -1.0f;
+    if (event.key.keysym.sym == SDLK_e)
+      m_truckSpeed = 1.0f;
+  }
 
-  abcg::glUseProgram(m_program);
+  if (event.type == SDL_KEYUP) {
+    if ((event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w) &&
+        m_dollySpeed > 0)
+      m_dollySpeed = 0.0f;
+    if ((event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s) &&
+        m_dollySpeed < 0)
+      m_dollySpeed = 0.0f;
+    if ((event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a) &&
+        m_panSpeed < 0)
+      m_panSpeed = 0.0f;
+    if ((event.key.keysym.sym == SDLK_RIGHT ||
+         event.key.keysym.sym == SDLK_d) &&
+        m_panSpeed > 0)
+      m_panSpeed = 0.0f;
+    if (event.key.keysym.sym == SDLK_q && m_truckSpeed < 0)
+      m_truckSpeed = 0.0f;
+    if (event.key.keysym.sym == SDLK_e && m_truckSpeed > 0)
+      m_truckSpeed = 0.0f;
+  }
 
-  // Set uniform variables for viewMatrix and projMatrix
-  // These matrices are used for every scene object
-  abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getViewMatrix()[0][0]);
-  abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getProjMatrix()[0][0]);
-
-  abcg::glBindVertexArray(m_VAO);
-
-  // Draw white bunny
-  glm::mat4 model{1.0f};
-  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
-  model = glm::scale(model, glm::vec3(0.5f));
-
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  // Draw yellow bunny
-  model = glm::mat4(1.0);
-  model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
-  model = glm::scale(model, glm::vec3(0.5f));
-
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  // Draw blue bunny
-  model = glm::mat4(1.0);
-  model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::scale(model, glm::vec3(0.5f));
-
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 0.0f, 0.8f, 1.0f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  // Draw red bunny
-  model = glm::mat4(1.0);
-  model = glm::scale(model, glm::vec3(0.1f));
-
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  abcg::glBindVertexArray(0);
-
-  // Draw ground
-  m_ground.paint();
-
-  abcg::glUseProgram(0);
-}
-
-void Window::onPaintUI() { abcg::OpenGLWindow::onPaintUI(); }
-
-void Window::onResize(glm::ivec2 const &size) {
-  m_viewportSize = size;
-  m_camera.computeProjectionMatrix(size);
-}
-
-void Window::onDestroy() {
-  m_ground.destroy();
-
-  abcg::glDeleteProgram(m_program);
-  abcg::glDeleteBuffers(1, &m_EBO);
-  abcg::glDeleteBuffers(1, &m_VBO);
-  abcg::glDeleteVertexArrays(1, &m_VAO);
-}
-
-void Window::onUpdate() {
-  auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
-
-  // Update LookAt camera
-  m_camera.dolly(m_dollySpeed * deltaTime);
-  m_camera.truck(m_truckSpeed * deltaTime);
-  m_camera.pan(m_panSpeed * deltaTime);
 }
