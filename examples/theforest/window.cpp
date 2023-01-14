@@ -20,6 +20,8 @@ void Window::onCreate() {
     randomizeTree(tree);
   }
 
+  randomizeSkull();
+
   // Enable depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
 
@@ -39,22 +41,22 @@ void Window::onCreate() {
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
 
   // Load model
-  loadModelFromFile(assetsPath + "Tree1.obj");
+  loadModelFromFileTree(assetsPath + "Tree1.obj");
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_VBO);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
   abcg::glBufferData(GL_ARRAY_BUFFER,
-                     sizeof(m_vertices.at(0)) * m_vertices.size(),
-                     m_vertices.data(), GL_STATIC_DRAW);
+                     sizeof(m_tree_vertex.at(0)) * m_tree_vertex.size(),
+                     m_tree_vertex.data(), GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Generate EBO
   abcg::glGenBuffers(1, &m_EBO);
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
   abcg::glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     sizeof(m_indices.at(0)) * m_indices.size(),
-                     m_indices.data(), GL_STATIC_DRAW);
+                     sizeof(m_tree_index.at(0)) * m_tree_index.size(),
+                     m_tree_index.data(), GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // Create VAO
@@ -103,9 +105,8 @@ void Window::onPaint() {
 
         abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
         abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
-        abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+        abcg::glDrawElements(GL_TRIANGLES, m_tree_index.size(), GL_UNSIGNED_INT,
                      nullptr);
-
   }
     
   abcg::glBindVertexArray(0);
@@ -126,6 +127,26 @@ void Window::randomizeTree(Tree &tree) {
   std::uniform_real_distribution<float> distSizeXZ(0.50f, 2.0f);
   tree.m_size =
       glm::vec3(distSizeXZ(m_randomEngine));
+}
+
+void Window::randomizeSkull() {
+  // Random position: x and y in [-20, 20), z in [-100, 0)
+  int selected_position = rand() % 4;
+  
+  if( selected_position == 0 ){
+    skull.s_position = glm::vec3(15.0f, 0.0f, 15.0f);   
+  } else if( selected_position == 1 ){
+    skull.s_position = glm::vec3(-15.0f, 0.0f, -15.0f);   
+  } else if( selected_position == 2 ){
+    skull.s_position = glm::vec3(-15.0f, 0.0f, 15.0f);   
+  } else {
+    skull.s_position = glm::vec3(15.0f, 0.0f, -15.0f);   
+  }
+  
+  skull.s_rotation =
+      glm::vec3(0.0f);
+  skull.s_size =
+      glm::vec3(0.5f);
 }
 
 void Window::onPaintUI() { 
@@ -181,7 +202,7 @@ void Window::onUpdate() {
   }
 }
 
-void Window::loadModelFromFile(std::string_view path) {
+void Window::loadModelFromFileTree(std::string_view path) {
   tinyobj::ObjReader reader;
 
   if (!reader.ParseFromFile(path.data())) {
@@ -199,8 +220,8 @@ void Window::loadModelFromFile(std::string_view path) {
   auto const &attributes{reader.GetAttrib()};
   auto const &shapes{reader.GetShapes()};
 
-  m_vertices.clear();
-  m_indices.clear();
+  m_tree_vertex.clear();
+  m_tree_index.clear();
 
   // A key:value map with key=Vertex and value=index
   std::unordered_map<Vertex, GLuint> hash{};
@@ -223,12 +244,12 @@ void Window::loadModelFromFile(std::string_view path) {
       // If map doesn't contain this vertex
       if (!hash.contains(vertex)) {
         // Add this index (size of m_vertices)
-        hash[vertex] = m_vertices.size();
+        hash[vertex] = m_tree_vertex.size();
         // Add this vertex
-        m_vertices.push_back(vertex);
+        m_tree_vertex.push_back(vertex);
       }
 
-      m_indices.push_back(hash[vertex]);
+      m_tree_index.push_back(hash[vertex]);
     }
   }
 }
