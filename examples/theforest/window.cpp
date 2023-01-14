@@ -95,58 +95,18 @@ void Window::onPaint() {
 
   abcg::glBindVertexArray(m_VAO);
 
-  // Draw white bunny
-  // glm::mat4 model{1.0f};
-  // model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-
-  // Draw yellow bunny
-  // model = glm::mat4(1.0);
-  // model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-
-  // Draw blue bunny
-  // model = glm::mat4(1.0);
-  // model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 0.0f, 0.8f, 1.0f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-
-  // Draw red bunny
-  // model = glm::mat4(1.0);
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-  
-
   for (auto &tree : m_tree)
-    {
+  {
         glm::mat4 model{1.0f};
         model = glm::translate(model, tree.m_position);
-        model = glm::scale(model, glm::vec3(0.5f));
+        model = glm::scale(model, tree.m_size);
 
         abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-        abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
+        abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
         abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
                      nullptr);
 
-    }
+  }
     
   abcg::glBindVertexArray(0);
 
@@ -158,14 +118,31 @@ void Window::onPaint() {
 
 void Window::randomizeTree(Tree &tree) {
   // Random position: x and y in [-20, 20), z in [-100, 0)
-  std::uniform_real_distribution<float> distPosXZ(-10.0f, 10.0f);
+  std::uniform_real_distribution<float> distPosXZ(-15.0f, 15.0f);
   //std::uniform_real_distribution<float> distPosY(-100.0f, 0.0f);
   tree.m_position =
       glm::vec3(distPosXZ(m_randomEngine), 0,
                 distPosXZ(m_randomEngine));
+  std::uniform_real_distribution<float> distSizeXZ(0.50f, 2.0f);
+  tree.m_size =
+      glm::vec3(distSizeXZ(m_randomEngine));
 }
 
-void Window::onPaintUI() { abcg::OpenGLWindow::onPaintUI(); }
+void Window::onPaintUI() { 
+  auto const appWindowWidth{gsl::narrow<float>(getWindowSettings().width)};
+
+  //abcg::OpenGLWindow::onPaintUI();
+  // Create a window called "My First Tool", with a menu bar.
+  { 
+    ImGui::SetNextWindowSize(ImVec2(appWindowWidth, 60));
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+
+    ImGui::Begin("MESSAGE", nullptr);
+    ImGui::TextColored(ImVec4(1,1,0,1), "JUST RUN!!!");
+    ImGui::EndChild();
+    ImGui::End();
+  }
+}
 
 void Window::onResize(glm::ivec2 const &size) {
   m_viewportSize = size;
@@ -188,6 +165,20 @@ void Window::onUpdate() {
   m_camera.dolly(m_dollySpeed * deltaTime);
   m_camera.truck(m_truckSpeed * deltaTime);
   m_camera.pan(m_panSpeed * deltaTime);
+  
+  
+  timeToChangeTree-= deltaTime;
+
+  if(timeToChangeTree<0.0f){
+    for (auto &tree : m_tree) {
+      if(rand() % 5 == 0){
+        randomizeTree(tree);
+      }
+      
+      
+    }
+    timeToChangeTree = 10.0f;
+  }
 }
 
 void Window::loadModelFromFile(std::string_view path) {

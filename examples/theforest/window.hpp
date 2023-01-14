@@ -28,6 +28,8 @@ class Window : public abcg::OpenGLWindow {
 
   private:
     std::default_random_engine m_randomEngine;
+
+    float timeToChangeTree = 10.0;
     
     glm::ivec2 m_viewportSize{};
 
@@ -50,6 +52,7 @@ class Window : public abcg::OpenGLWindow {
 
     struct Tree {
       glm::vec3 m_position{};
+      glm::vec3 m_size{};
     };
 
     std::array<Tree, 500> m_tree;
