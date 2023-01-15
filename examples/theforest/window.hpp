@@ -7,14 +7,11 @@
 
 #include "camera.hpp"
 #include "ground.hpp"
+#include "skull.hpp"
+#include "vertex.hpp"
 
 #define N_TREES 500
 
-struct Vertex {
-  glm::vec3 position;
-
-  friend bool operator==(Vertex const &, Vertex const &) = default;
-};
 
 class Window : public abcg::OpenGLWindow {
   protected:
@@ -50,35 +47,21 @@ class Window : public abcg::OpenGLWindow {
 
     Ground m_ground;
 
+    Skull m_skull;
+
     struct Tree {
       glm::vec3 m_position{};
       glm::vec3 m_size{};
     };
 
-    struct Skull {
-      glm::vec3 s_position{};
-      glm::vec3 s_rotation{};
-      glm::vec3 s_size{};
-    };
-
     std::array<Tree, 500> m_tree;
-
-    Skull skull;
 
     std::vector<Vertex> m_tree_vertex; // vertices lidos do arquivo OBJ
     std::vector<GLuint> m_tree_index; // indices lidos do arquivo OBJ
 
-    std::vector<Vertex> m_skull_vertex; // vertices lidos do arquivo OBJ
-    std::vector<GLuint> m_skull_index; // indices lidos do arquivo OBJ
-
     void loadModelFromFileTree(std::string_view path); //carregamento do arquivo OBJ
 
-    void loadModelFromFileSkull(std::string_view path); //carregamento do arquivo OBJ
-
     void randomizeTree(Tree &tree);
-
-    void randomizeSkull();
-
 };
 
 #endif

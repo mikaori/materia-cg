@@ -2,14 +2,6 @@
 
 #include <unordered_map>
 
-// Explicit specialization of std::hash for Vertex
-template <> struct std::hash<Vertex> {
-  size_t operator()(Vertex const &vertex) const noexcept {
-    auto const h1{std::hash<glm::vec3>()(vertex.position)};
-    return h1;
-  }
-};
-
 void Window::onCreate() {
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
@@ -19,8 +11,6 @@ void Window::onCreate() {
   for (auto &tree : m_tree) {
     randomizeTree(tree);
   }
-
-  randomizeSkull();
 
   // Enable depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
@@ -33,6 +23,7 @@ void Window::onCreate() {
                                   .stage = abcg::ShaderStage::Fragment}});
 
   m_ground.create(m_program);
+  m_skull.create(m_program);
 
   // Get location of uniform variables
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
@@ -113,47 +104,26 @@ void Window::onPaint() {
 
   // Draw ground
   m_ground.paint();
+  m_skull.paint();
 
   abcg::glUseProgram(0);
 }
 
 void Window::randomizeTree(Tree &tree) {
+  
   // Random position: x and y in [-20, 20), z in [-100, 0)
   std::uniform_real_distribution<float> distPosXZ(-15.0f, 15.0f);
-  //std::uniform_real_distribution<float> distPosY(-100.0f, 0.0f);
   tree.m_position =
       glm::vec3(distPosXZ(m_randomEngine), 0,
                 distPosXZ(m_randomEngine));
-  std::uniform_real_distribution<float> distSizeXZ(0.50f, 2.0f);
-  tree.m_size =
-      glm::vec3(distSizeXZ(m_randomEngine));
-}
 
-void Window::randomizeSkull() {
-  // Random position: x and y in [-20, 20), z in [-100, 0)
-  int selected_position = rand() % 4;
-  
-  if( selected_position == 0 ){
-    skull.s_position = glm::vec3(15.0f, 0.0f, 15.0f);   
-  } else if( selected_position == 1 ){
-    skull.s_position = glm::vec3(-15.0f, 0.0f, -15.0f);   
-  } else if( selected_position == 2 ){
-    skull.s_position = glm::vec3(-15.0f, 0.0f, 15.0f);   
-  } else {
-    skull.s_position = glm::vec3(15.0f, 0.0f, -15.0f);   
-  }
-  
-  skull.s_rotation =
-      glm::vec3(0.0f);
-  skull.s_size =
-      glm::vec3(0.5f);
+  std::uniform_real_distribution<float> distSizeXZ(0.50f, 2.0f);
+  tree.m_size = glm::vec3(distSizeXZ(m_randomEngine));
 }
 
 void Window::onPaintUI() { 
   auto const appWindowWidth{gsl::narrow<float>(getWindowSettings().width)};
 
-  //abcg::OpenGLWindow::onPaintUI();
-  // Create a window called "My First Tool", with a menu bar.
   { 
     ImGui::SetNextWindowSize(ImVec2(appWindowWidth, 60));
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -172,6 +142,7 @@ void Window::onResize(glm::ivec2 const &size) {
 
 void Window::onDestroy() {
   m_ground.destroy();
+  m_skull.destroy();
 
   abcg::glDeleteProgram(m_program);
   abcg::glDeleteBuffers(1, &m_EBO);
@@ -187,7 +158,6 @@ void Window::onUpdate() {
   m_camera.truck(m_truckSpeed * deltaTime);
   m_camera.pan(m_panSpeed * deltaTime);
   
-  
   timeToChangeTree-= deltaTime;
 
   if(timeToChangeTree<0.0f){
@@ -195,11 +165,11 @@ void Window::onUpdate() {
       if(rand() % 5 == 0){
         randomizeTree(tree);
       }
-      
-      
     }
     timeToChangeTree = 10.0f;
   }
+
+  m_skull.update(deltaTime, m_camera);
 }
 
 void Window::loadModelFromFileTree(std::string_view path) {

@@ -15,6 +15,8 @@ public:
 
   glm::mat4 const &getViewMatrix() const { return m_viewMatrix; }
   glm::mat4 const &getProjMatrix() const { return m_projMatrix; }
+  
+  glm::vec3 getCameraPosition();
 
 private:
   glm::vec3 m_eye{0.0f, 0.5f, 2.5f}; // Camera position

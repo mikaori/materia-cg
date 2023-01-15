@@ -48,3 +48,7 @@ void Camera::pan(float speed) {
 
   computeViewMatrix();
 }
+
+glm::vec3 Camera::getCameraPosition(){
+  return m_eye;
+}
