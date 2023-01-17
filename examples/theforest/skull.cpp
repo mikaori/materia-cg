@@ -2,6 +2,10 @@
 
 #include <unordered_map>
 #include <cmath>
+#include <iostream>
+#include <fstream>
+#include <glm/gtx/fast_trigonometry.hpp>
+
 
 void Skull::create(GLuint program) {
 
@@ -54,17 +58,17 @@ void Skull::randomizeSkull() {
   int selected_position = rand() % 4;
   
   if( selected_position == 0 ){
-    s_position = glm::vec3{1.0f, 0.5f, 3.5f};   
+    s_position = glm::vec3{15.0f, 0.20f, 15.0f};   
   } else if( selected_position == 1 ){
-    s_position = glm::vec3{1.0f, 0.5f, 3.5f};   
+    s_position = glm::vec3{15.0f, 0.20f, -15.0f};   
   } else if( selected_position == 2 ){
-    s_position = glm::vec3{1.0f, 0.5f, 3.5f};   
+    s_position = glm::vec3{-15.0f, 0.20f, 15.0f};   
   } else {
-    s_position = glm::vec3{1.0f, 0.5f, 3.5f};   
+    s_position = glm::vec3{-15.0f, 0.20f, -15.0f};   
   }
   
   s_rotation = 0.0f;
-  s_size = glm::vec3(0.02f);
+  s_size = glm::vec3(0.0006f);
 }
 
 void Skull::paint() {
@@ -84,23 +88,35 @@ void Skull::paint() {
   abcg::glBindVertexArray(0);
 }
 
+/// @brief liberar os recursos do OpenGL que foram alocados em onCreate ou durante a aplicação
 void Skull::destroy() {
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
 
+/// @brief realiza o update da posição e rotação da shuriken
+/// @param deltaTime tempo entre os quadros de exibição
+/// @param camera recebe a classe responsável pela Câmera
 void Skull::update(float deltaTime, Camera camera){
    
-  glm::vec3 diffVectorPosition = glm::normalize(camera.getCameraPosition() - s_position);
+  glm::vec3 diffVectorPosition = glm::normalize(camera.getCameraPosition() - s_position); // normaliza a diferença entre os vetores da posição da câmera e a posição da shuriken
   
-  //s_position += diffVectorPosition * deltaTime * 0.2f;
+  s_position += (diffVectorPosition * glm::vec3(1.0f,0.0f, 1.0f)) * deltaTime * 1.5f; // velocidade no qual a shuriren se move
 
-  s_rotation = glm::acos(glm::dot(diffVectorPosition, glm::vec3(1.0f,0.0f,0.0f)));
+  s_rotation += 20.0f * deltaTime; // velocidade de rotação
 
-  printf("teste\n");
 }
 
+/// @brief verifica se a shuriken alcançou o player
+/// @param position_verify posição da câmera
+/// @return posição da shuriken
+bool Skull::touch(glm::vec3 position_verify){
+  return glm::distance(position_verify, s_position) < 0.5f;
+}
+
+/// @brief Carrega o modelo da shuriken - Retirado das notas de aula
+/// @param path caminho do asset que contem o arquivo .obj da shuriken
 void Skull::loadModelFromFileSkull(std::string_view path) {
   tinyobj::ObjReader reader;
 

@@ -103,3 +103,75 @@ O cenário é composto pelos seguintes objetos:
 
 - O jogo é reiniciado sozinho depois de um tempo que o usuário consegue coletar todas as bolas.
 
+
+## Atividade 03 - SquidGame
+
+[LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/squidgame/) 
+
+A aplicação consiste em simular a fuga contra a *shuriken* conhecida como **Skull**. 
+
+O que ela tem de diferente? Bom, ela persegue qualquer um que entrar na floresta na escuridão da noite! 
+
+O nome dela é Skull? Sim, pois ela alcança todos que passam pela floresta a noite e todos que tiveram o mesmo triste fim... :skull_and_crossbones:
+
+Assim, nesta aplicação o player possui **um único objetivo**: CORRER! 
+
+Todavia, tem coisas na vida que não temos como fugir. Neste mini game não há rotas de fuga suficiente para o player vencer. O QUE? É isso mesmo??? Sim. A *skuriken* é rápida... mais rápida do que o player consegue fugir! :cold_sweat:
+
+Além disso, a floresta não fornece nenhuma ajuda ao player, muito pelo contrário... a cada 10 segundos, aleatoriamente algumas das árvores trocam de lugar para deixar o jogador ainda mais confuso. 
+
+Assim, existe apenas **um destino para o player**: a shuriken avança  de algum canto do cenário perseguindo-o, quando ela o alcança, o player é atingido e o jogo **encerra sozinho** representando a morte dele. 
+
+O game é em primeira pessoa e a câmera representa a visão do player. 
+
+A interação do usuário ocorre por meio das teclas A, W, S, D ou  ←, →,  ↑ e ↓. As teclas A e D são responsáveis pela movimentação lateral da posição da câmera (movimento conhecido como pan).  As teclas W e S realizam a movimentação da posição da câmera para frente e para trás (movimento conhecido também como dolly) .
+
+**Implementações realizadas:**
+
+*Interface*
+- Mensagem para o jogador indicando o que ele deve fazer. 
+
+- Cenário: o background do cenário é composto por um fundo preto representando a noite escura, esse background também limita o campo de visão do player. Além disso, existem árvores no cenário para representar por uma floresta.
+
+- Câmera: representa a visão do player no jogo.
+
+- Personagem: Shuriken 3D que persegue o player.
+
+*Implementação do código*
+- A estrutura do código foi implementada com base em máquina de estados. Dessa forma, tem-se dois estados: Playing e GameOver.
+
+1. **Playing**: O jogo inicia no estado de playing, pois o jogador já começa no meio da floresta fugindo do inimigo.
+2. **GameOver**: Verifica se o inimigo alcançou o jogador.
+
+**camera.hpp**
+A implementação da câmera util;izou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos todos os atrivutos necessários para criar o quadro da câmera. 
+
+**camera.cpp**
+
+
+**gamedata.hpp**
+
+
+**ground.hpp**
+
+
+**ground.cpp**
+
+
+**main.cpp**
+
+
+**skull.hpp**
+
+
+**skull.cpp**
+
+
+**vertex.hpp**
+
+
+**window.hpp**
+
+
+**window.cpp**
+

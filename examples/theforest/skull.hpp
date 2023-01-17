@@ -11,6 +11,7 @@ public:
   void paint();
   void destroy();
   void update(float deltaTime, Camera camera);
+  bool touch(glm::vec3 position_verify);
 
 private:
   GLuint m_VAO{};

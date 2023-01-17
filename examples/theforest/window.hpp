@@ -9,6 +9,7 @@
 #include "ground.hpp"
 #include "skull.hpp"
 #include "vertex.hpp"
+#include "gamedata.hpp"
 
 #define N_TREES 500
 
@@ -27,6 +28,8 @@ class Window : public abcg::OpenGLWindow {
     std::default_random_engine m_randomEngine;
 
     float timeToChangeTree = 10.0;
+    float timeToEndGame = 10.0;
+    float startingPlayerMov = 10.0;
     
     glm::ivec2 m_viewportSize{};
 
@@ -49,12 +52,14 @@ class Window : public abcg::OpenGLWindow {
 
     Skull m_skull;
 
+    GameData m_gameData;
+
     struct Tree {
       glm::vec3 m_position{};
       glm::vec3 m_size{};
     };
 
-    std::array<Tree, 500> m_tree;
+    std::array<Tree, 1500> m_tree;
 
     std::vector<Vertex> m_tree_vertex; // vertices lidos do arquivo OBJ
     std::vector<GLuint> m_tree_index; // indices lidos do arquivo OBJ

@@ -2,10 +2,10 @@
 
 void Ground::create(GLuint program) {
   // Unit quad on the xz plane
-  std::array<glm::vec3, 4> vertices{{{-15.0f, 0.0f, +15.0f},
-                                     {-15.0f, 0.0f, -15.0f},
-                                     {+15.0f, 0.0f, +15.0f},
-                                     {+15.0f, 0.0f, -15.0f}}};
+  std::array<glm::vec3, 4> vertices{{{-20.0f, 0.0f, +20.0f},
+                                     {-20.0f, 0.0f, -20.0f},
+                                     {+20.0f, 0.0f, +20.0f},
+                                     {+20.0f, 0.0f, -20.0f}}};
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_VBO);

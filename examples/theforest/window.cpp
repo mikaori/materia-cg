@@ -3,6 +3,9 @@
 #include <unordered_map>
 
 void Window::onCreate() {
+
+  m_gameData.m_state = State::Playing;
+  
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
   abcg::glClearColor(0, 0, 0, 1);
@@ -112,7 +115,7 @@ void Window::onPaint() {
 void Window::randomizeTree(Tree &tree) {
   
   // Random position: x and y in [-20, 20), z in [-100, 0)
-  std::uniform_real_distribution<float> distPosXZ(-15.0f, 15.0f);
+  std::uniform_real_distribution<float> distPosXZ(-20.0f, 20.0f);
   tree.m_position =
       glm::vec3(distPosXZ(m_randomEngine), 0,
                 distPosXZ(m_randomEngine));
@@ -129,7 +132,13 @@ void Window::onPaintUI() {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
 
     ImGui::Begin("MESSAGE", nullptr);
-    ImGui::TextColored(ImVec4(1,1,0,1), "JUST RUN!!!");
+
+    if(m_gameData.m_state == State::Playing){
+      ImGui::TextColored(ImVec4(1,1,0,1), "JUST RUN!!!");
+    } else {
+      ImGui::TextColored(ImVec4(1,1,0,1), "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...");
+    }
+    
     ImGui::EndChild();
     ImGui::End();
   }
@@ -158,8 +167,8 @@ void Window::onUpdate() {
   m_camera.truck(m_truckSpeed * deltaTime);
   m_camera.pan(m_panSpeed * deltaTime);
   
+  // Randomize Tree position
   timeToChangeTree-= deltaTime;
-
   if(timeToChangeTree<0.0f){
     for (auto &tree : m_tree) {
       if(rand() % 5 == 0){
@@ -169,7 +178,22 @@ void Window::onUpdate() {
     timeToChangeTree = 10.0f;
   }
 
+  // Update shuriken position and rotation
   m_skull.update(deltaTime, m_camera);
+
+  // Verify if the shuriken have "touch" the camera
+  if(m_skull.touch(m_camera.getCameraPosition())){
+    m_gameData.m_state = State::GameOver;
+  }
+
+  // Exit the execution if the state is GameOver
+  if(m_gameData.m_state == State::GameOver){
+    timeToEndGame -= deltaTime;
+    if( timeToEndGame < 0.0f){
+      exit(0);
+    }
+  }
+
 }
 
 void Window::loadModelFromFileTree(std::string_view path) {
