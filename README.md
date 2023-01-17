@@ -7,7 +7,7 @@
 ## Atividade 01 - SquidGame
 
 [LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/squidgame/) 
-
+ 
 **Como é a aplicação?**
 
 A aplicação é uma representação da Ponte de Crital, este jogo é apresentado na série Round 6 como o quinto desafio dos participantes. 
@@ -138,40 +138,47 @@ A interação do usuário ocorre por meio das teclas A, W, S, D ou  ←, →,  �
 - Personagem: Shuriken 3D que persegue o player.
 
 *Implementação do código*
-- A estrutura do código foi implementada com base em máquina de estados. Dessa forma, tem-se dois estados: Playing e GameOver.
 
+**camera.hpp**
+A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos todos os atributos necessários para criar o quadro da câmera. 
+
+**camera.cpp**
+A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos as funções da câmera, ou seja, aqui implementamos o movimento dolly, truk e pan da camera. Essas funções funcionam realizando modificações nas variáveis m_eye e m_at tal que a camera passa a alterar a posição e a sua orientação.
+
+**gamedata.hpp**
+A estrutura do código foi implementada com base em máquina de estados. Neste arquivo está contido a classe State utilizada para controlar os estados do jogo através da struct GameData. Existem apenas dois estados nesta aplicação: 
 1. **Playing**: O jogo inicia no estado de playing, pois o jogador já começa no meio da floresta fugindo do inimigo.
 2. **GameOver**: Verifica se o inimigo alcançou o jogador.
 
-**camera.hpp**
-A implementação da câmera util;izou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos todos os atrivutos necessários para criar o quadro da câmera. 
-
-**camera.cpp**
-
-
-**gamedata.hpp**
-
-
 **ground.hpp**
-
+Contém a definição da classe Ground que é responsável pelo desenho do chão. O código utilizado foi visto nas notas de aula. 
 
 **ground.cpp**
-
+Contém a implementação das funções da classe Ground. O código utilizado foi visto nas notas de aula. Todavia, foi feito uma alteração para ser desenhado uma grade de 20x20 quadriláteros com apenas uma cor (no caso, verde). A cor do chão representa a grama da floresta.
 
 **main.cpp**
-
+Definição os pontos de entrada da aplicação. O código usado é o mesmo das notas de aula. Nenhuma modificação foi realizada além do título da janela.
 
 **skull.hpp**
-
+Aqui é definido a classe Shuriken, responsável pelo desenho da shuriken na aplicação.
 
 **skull.cpp**
-
+Possui a implementação das definições da classe Shuriken. Realiza a renderização da shuriken de maneira que a posição dela ao inicio do jogo é sempre aleatória. A shuriken pode surgir de qualquer um dos quatro cantos do mapa, ela será posta há uma distância que inicialmente o jogador não conseguirá identificar de onde ela irá surgir. Implementa-se também o movimento da shuriken, o movimento de perseguição ocorre pela normalização da diferença entre os vetores de posição da shuriken e da câmera. Por fim, é verificado se a shuriken alcançou a câmera analisando se a distancia entre os vetores é menor que 0.5f.
 
 **vertex.hpp**
-
+Os códigos neste arquivo utilizam os códigos vistos em aula. Dessa forma, foi implementado a struct que define os atributos que compõe um vértice. Cada um dos vértices possuem apenas uma posição definida (x,y,z) e um operador que verifica se dois vértices são iguais. Além disso, tem-se também a especialização explícita de std::hash para a estrutura de Vertex definida.
 
 **window.hpp**
-
+Implementação das definições da classe Window. Ela é responsável tanto pelo gerenciamento da janela da aplicação quanto pela lógica do jogo.  
 
 **window.cpp**
+Implementa as funções declaradas na classe Window. Assim, aqui é tratado:
+- Os eventos de teclado de forma que quando alguma das teclas (AWSD ou as setas) é pressionada ou liberada, a velocidade de dolly, pan ou truck é alterada para -1, 1 ou 0. 
 
+- É realizado também a rederização do total de 1500 árvore. Cada vez que o jogo inicia, a posição de cada árvore no jogo é aleatória. Além disso, ocorre também a alteração da posição de 1/5 das árvores de forma aleatória.
+
+- Implementação de mensagens no jogo conforme o status da aplicação. Utilizou-se um widget da ImGui para exibir a mensagem na interface. Os estados apresentam as seguintes mensagens:
+1. **Playing**: "JUST RUN!!!".
+2. **GameOver**: "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...".
+
+- Realiza também o update a rotação e da posição da shuriken conforme a posição da câmera, dando ao player a sensação de estar sendo perseguido pela shuriken. Verifica também se a shuriken alcançou o jogador, caso tenha alcançado o status do jogo altera para GameOver e o jogo se encerra em 10s. 
