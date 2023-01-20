@@ -104,69 +104,74 @@ O cenário é composto pelos seguintes objetos:
 - O jogo é reiniciado sozinho depois de um tempo que o usuário consegue coletar todas as bolas.
 
 
-## Atividade 03 - SquidGame
+## Atividade 03 - The Forest
 
-[LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/squidgame/) 
+[LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/theforest/) 
 
 A aplicação consiste em simular a fuga contra a *shuriken* conhecida como **Skull**. 
 
 O que ela tem de diferente? Bom, ela persegue qualquer um que entrar na floresta na escuridão da noite! 
 
-O nome dela é Skull? Sim, pois ela alcança todos que passam pela floresta a noite e todos que tiveram o mesmo triste fim... :skull_and_crossbones:
+O nome dela é Skull? Sim, pois quando ela alcança todos que passam pela floresta, estes possuem o mesmo triste fim... :skull_and_crossbones:
 
-Assim, nesta aplicação o player possui **um único objetivo**: CORRER! 
+Assim, nesta aplicação o player possui **um único objetivo**: TENTAR FUGIR! 
 
-Todavia, tem coisas na vida que não temos como fugir. Neste mini game não há rotas de fuga suficiente para o player vencer. O QUE? É isso mesmo??? Sim. A *skuriken* é rápida... mais rápida do que o player consegue fugir! :cold_sweat:
+Todavia, tem coisas na vida que não temos como fugir. Neste mini game não há rotas de fuga para o player vencer. O QUE? É isso mesmo??? Sim. A *skuriken* é rápida... mais rápida do que o player consegue fugir! :cold_sweat:
 
 Além disso, a floresta não fornece nenhuma ajuda ao player, muito pelo contrário... a cada 10 segundos, aleatoriamente algumas das árvores trocam de lugar para deixar o jogador ainda mais confuso. 
 
-Assim, existe apenas **um destino para o player**: a shuriken avança  de algum canto do cenário perseguindo-o, quando ela o alcança, o player é atingido e o jogo **encerra sozinho** representando a morte dele. 
+Assim, existe apenas **um destino para o player**: a shuriken avança de algum canto do cenário perseguindo-o, quando ela o alcança, o player é atingido e o jogo **encerra sozinho** representando a morte dele. 
 
 O game é em primeira pessoa e a câmera representa a visão do player. 
 
-A interação do usuário ocorre por meio das teclas A, W, S, D ou  ←, →,  ↑ e ↓. As teclas A e D são responsáveis pela movimentação lateral da posição da câmera (movimento conhecido como pan).  As teclas W e S realizam a movimentação da posição da câmera para frente e para trás (movimento conhecido também como dolly) .
+A interação do usuário ocorre por meio das teclas A, W, S, D ou  ←, →, ↑ e ↓. As teclas A e D são responsáveis pela movimentação lateral da posição da câmera (movimento conhecido como pan). As teclas W e S realizam a movimentação da posição da câmera para frente e para trás (movimento conhecido também como dolly) .
 
-**Implementações realizadas:**
+### **Implementações realizadas:**
 
-*Interface*
+### *Interface*
 - Mensagem para o jogador indicando o que ele deve fazer. 
 
-- Cenário: o background do cenário é composto por um fundo preto representando a noite escura, esse background também limita o campo de visão do player. Além disso, existem árvores no cenário para representar por uma floresta.
+- Cenário: o background do cenário é composto por um fundo preto representando a noite escura, esse background também limita o campo de visão do player. Além disso, existem árvores no cenário para representar uma floresta.
 
 - Câmera: representa a visão do player no jogo.
 
 - Personagem: Shuriken 3D que persegue o player.
 
-*Implementação do código*
+### *Implementação do código*
 
 **camera.hpp**
 A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos todos os atributos necessários para criar o quadro da câmera. 
 
 **camera.cpp**
-A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos as funções da câmera, ou seja, aqui implementamos o movimento dolly, truk e pan da camera. Essas funções funcionam realizando modificações nas variáveis m_eye e m_at tal que a camera passa a alterar a posição e a sua orientação.
+A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Neste arquivo definimos as funções da câmera, ou seja, aqui implementamos o movimento dolly, truck e pan da camera. Essas funções realizam modificações nas variáveis m_eye e m_at tal que a camera passa a alterar a posição e a sua orientação.
 
 **gamedata.hpp**
-A estrutura do código foi implementada com base em máquina de estados. Neste arquivo está contido a classe State utilizada para controlar os estados do jogo através da struct GameData. Existem apenas dois estados nesta aplicação: 
-1. **Playing**: O jogo inicia no estado de playing, pois o jogador já começa no meio da floresta fugindo do inimigo.
-2. **GameOver**: Verifica se o inimigo alcançou o jogador.
+O controle do estado da vida do player foi implementada com base em máquina de estados. Neste arquivo está contido a classe State utilizada para controlar os estados do jogo através da struct GameData. Existem apenas dois estados nesta aplicação: 
+1. **Playing**: O estado representa que o jogador está tentando fugir. Esse é o estado inicial.
+2. **GameOver**: Preparação para finalização do jogo.
 
 **ground.hpp**
 Contém a definição da classe Ground que é responsável pelo desenho do chão. O código utilizado foi visto nas notas de aula. 
 
 **ground.cpp**
-Contém a implementação das funções da classe Ground. O código utilizado foi visto nas notas de aula. Todavia, foi feito uma alteração para ser desenhado uma grade de 20x20 quadriláteros com apenas uma cor (no caso, verde). A cor do chão representa a grama da floresta.
+Contém a implementação das funções da classe Ground. O código utilizado foi visto nas notas de aula. Todavia, foi feito uma alteração para ser desenhado um quadriláterio de 20x20 unidades com apenas uma cor (no caso, verde). A cor do chão representa a grama da floresta.
 
 **main.cpp**
 Definição os pontos de entrada da aplicação. O código usado é o mesmo das notas de aula. Nenhuma modificação foi realizada além do título da janela.
 
 **skull.hpp**
-Aqui é definido a classe Shuriken, responsável pelo desenho da shuriken na aplicação.
+Aqui é definido a classe Shuriken, responsável pelo desenho da shuriken Skull na aplicação.
 
 **skull.cpp**
-Possui a implementação das definições da classe Shuriken. Realiza a renderização da shuriken de maneira que a posição dela ao inicio do jogo é sempre aleatória. A shuriken pode surgir de qualquer um dos quatro cantos do mapa, ela será posta há uma distância que inicialmente o jogador não conseguirá identificar de onde ela irá surgir. Implementa-se também o movimento da shuriken, o movimento de perseguição ocorre pela normalização da diferença entre os vetores de posição da shuriken e da câmera. Por fim, é verificado se a shuriken alcançou a câmera analisando se a distancia entre os vetores é menor que 0.5f.
+Possui a implementação das definições da classe Shuriken, o qual esta classe apresenta quatro responsabilidades. A primeira é a renderização da shuriken. Já a segunda é definir a posição da skuriken no inicio do jogo, esta posição ocorre de maneira aleatória, podendo surgir nos seguintes pontos: {-15.0f, 0.20f, -15.0f}, {15.0f, 0.20f, 15.0f}, {-15.0f, 0.20f, 15.0f} e {15.0f, 0.20f, -15.0f}. O objetivo desses pontos é o jogador não conseguir identificar de onde ela irá surgir. 
+
+A terceira é o movimento da shuriken que simula o efeito de perseguição em direção ao player. Para realizar este efeito é somado a posição da Skull o resultado da normalização da diferença entre os vetores de posição da shuriken e da câmera. 
+
+Por fim, a quarta responsabilidade verifica se a shuriken encostou em algo. Isso será utilizado para verificar se a Skull tocou a câmera. A forma de implementação é medindo se a distancia entre a Skull e o objeto é menor que 0.5f, caso positivo, a Skull encostou.
 
 **vertex.hpp**
-Os códigos neste arquivo utilizam os códigos vistos em aula. Dessa forma, foi implementado a struct que define os atributos que compõe um vértice. Cada um dos vértices possuem apenas uma posição definida (x,y,z) e um operador que verifica se dois vértices são iguais. Além disso, tem-se também a especialização explícita de std::hash para a estrutura de Vertex definida.
+Os códigos neste arquivo utilizam os códigos vistos em aula.
+Há necessidade de criar este arquivo foi devido a utilização se suas estruturas em mais de uma classe. Dessa forma, foi implementado a struct que define os atributos que compõe um vértice. Cada um dos vértices possuem apenas uma posição definida (x,y,z) e um operador que verifica se dois vértices são iguais. Além disso, tem-se também a especialização explícita de std::hash para a estrutura de Vertex definida.
 
 **window.hpp**
 Implementação das definições da classe Window. Ela é responsável tanto pelo gerenciamento da janela da aplicação quanto pela lógica do jogo.  
@@ -175,10 +180,10 @@ Implementação das definições da classe Window. Ela é responsável tanto pel
 Implementa as funções declaradas na classe Window. Assim, aqui é tratado:
 - Os eventos de teclado de forma que quando alguma das teclas (AWSD ou as setas) é pressionada ou liberada, a velocidade de dolly, pan ou truck é alterada para -1, 1 ou 0. 
 
-- É realizado também a rederização do total de 1500 árvore. Cada vez que o jogo inicia, a posição de cada árvore no jogo é aleatória. Além disso, ocorre também a alteração da posição de 1/5 das árvores de forma aleatória.
+- É realizado também a rederização do total de 1500 árvore. Cada vez que o jogo inicia, a posição de cada árvore no jogo é gerada de forma aleatória. Além disso, ocorre também a alteração da posição de 1/5 das árvores de forma aleatória.
 
-- Implementação de mensagens no jogo conforme o status da aplicação. Utilizou-se um widget da ImGui para exibir a mensagem na interface. Os estados apresentam as seguintes mensagens:
-1. **Playing**: "JUST RUN!!!".
-2. **GameOver**: "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...".
+- Implementação de mensagens no jogo conforme o estado da player. Para isso utilizou-se um widget da ImGui para exibir a mensagem na interface. Os estados apresentam as seguintes mensagens:
+  1. **Playing**: "JUST RUN!!!".
+  2. **GameOver**: "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...".
 
-- Realiza também o update a rotação e da posição da shuriken conforme a posição da câmera, dando ao player a sensação de estar sendo perseguido pela shuriken. Verifica também se a shuriken alcançou o jogador, caso tenha alcançado o status do jogo altera para GameOver e o jogo se encerra em 10s. 
+- Realiza-se também o update da rotação e da posição da shuriken conforme a posição da câmera, o que dá ao player a sensação de estar sendo perseguido pela shuriken. Verifica-se também se a shuriken alcançou o jogador, caso tenha alcançado, o status do jogo é alterado para GameOver. Esta alteração dá sequência a um cronometro de 10s que quando acaba o seu tempo o jogo é encerrado.  

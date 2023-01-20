@@ -109,6 +109,8 @@ void Window::onPaint() {
   m_ground.paint();
   m_skull.paint();
 
+  abcg::glFrontFace(GL_CW);
+
   abcg::glUseProgram(0);
 }
 

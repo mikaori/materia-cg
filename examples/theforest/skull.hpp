@@ -18,7 +18,6 @@ private:
   GLuint m_VBO{};
   GLuint m_EBO{};
 
-
   GLint m_modelMatrixLoc{};
   GLint m_colorLoc{};
 
