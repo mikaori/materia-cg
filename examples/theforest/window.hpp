@@ -11,8 +11,8 @@
 #include "vertex.hpp"
 #include "gamedata.hpp"
 
-#define N_TREES 500
-
+// variável com o número de árvores no cenário
+#define N_TREES 1500
 
 class Window : public abcg::OpenGLWindow {
   protected:
@@ -29,7 +29,6 @@ class Window : public abcg::OpenGLWindow {
 
     float timeToChangeTree = 10.0;
     float timeToEndGame = 10.0;
-    float startingPlayerMov = 10.0;
     
     glm::ivec2 m_viewportSize{};
 
@@ -38,20 +37,25 @@ class Window : public abcg::OpenGLWindow {
     GLuint m_EBO{};
     GLuint m_program{};
 
+    // identificadores das variáveis uniform do vertex shader
     GLint m_viewMatrixLocation{};
     GLint m_projMatrixLocation{};
     GLint m_modelMatrixLocation{};
     GLint m_colorLocation{};
 
+    // definição de um objeto da classe Camera para controlar a câmera
     Camera m_camera;
     float m_dollySpeed{}; //câmera ir para a frente e para trás ao longo da direção de visão
     float m_truckSpeed{}; //câmera deslizar para os lados
     float m_panSpeed{}; //câmera girar em torno de seu eixo y
 
+    // definição de um objeto da classe Ground para desenhar o chão
     Ground m_ground;
 
+    // definição de um objeto da classe Skull para controlar a shuriken
     Skull m_skull;
 
+    // definição de um objeto da classe GameData para controlar os estados do player
     GameData m_gameData;
 
     struct Tree {
@@ -59,7 +63,7 @@ class Window : public abcg::OpenGLWindow {
       glm::vec3 m_size{};
     };
 
-    std::array<Tree, 1500> m_tree;
+    std::array<Tree, N_TREES> m_tree;
 
     std::vector<Vertex> m_tree_vertex; // vertices lidos do arquivo OBJ
     std::vector<GLuint> m_tree_index; // indices lidos do arquivo OBJ

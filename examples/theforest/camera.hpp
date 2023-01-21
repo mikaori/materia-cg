@@ -9,13 +9,16 @@ public:
   void computeViewMatrix();
   void computeProjectionMatrix(glm::vec2 const &size);
 
+  // funções que modificam as variáveis m_eye e m_at
   void dolly(float speed);
   void truck(float speed);
   void pan(float speed);
 
+  // funções de acesso à matriz de visão e projeção
   glm::mat4 const &getViewMatrix() const { return m_viewMatrix; }
   glm::mat4 const &getProjMatrix() const { return m_projMatrix; }
   
+  // pega a posição da câmera
   glm::vec3 getCameraPosition();
 
 private:

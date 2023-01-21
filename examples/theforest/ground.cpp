@@ -34,9 +34,6 @@ void Ground::create(GLuint program) {
 void Ground::paint() {
   abcg::glBindVertexArray(m_VAO);
 
-  // Draw a grid of 2N+1 x 2N+1 tiles on the xz plane, centered around the
-  // origin
-
   // Set model matrix as a translation matrix
   glm::mat4 model{1.0f};
   abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
