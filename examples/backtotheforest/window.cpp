@@ -21,9 +21,9 @@ void Window::onCreate() {
 
   // Create program
   m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "theforest.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/theforest.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "theforest.frag",
+                                 {.source = assetsPath + "shaders/theforest.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
   // inicializa o VAO/VBO do chão
