@@ -11,10 +11,10 @@ void Window::onCreate() {
 
   abcg::glClearColor(0, 0, 0, 1);
 
-  // Enable depth buffering
+  // habilita depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
 
-  // Create program
+  // criação do program
   m_program =
       abcg::createOpenGLProgram({{.source = assetsPath + "shaders/theforest.vert",
                                   .stage = abcg::ShaderStage::Vertex},
@@ -30,14 +30,13 @@ void Window::onCreate() {
   // inicializa o VAO/VBO da floresta
   m_forest.create(m_program);
 
-  // Get location of uniform variables
+  // pega a localização das variáveis uniformes
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
   
 }
-
 
 void Window::onPaint() {
   // Clear color buffer and depth buffer
@@ -55,13 +54,13 @@ void Window::onPaint() {
                            &m_camera.getProjMatrix()[0][0]);
 
   // Desenha o chão
-  m_ground.paint();
+  m_ground.paint(m_camera);
 
   // Desenha a shuriken
-  m_skull.paint();
+  m_skull.paint(m_camera);
 
   // Desenha as árvores
-  m_forest.paint();
+  m_forest.paint(m_camera);
 
   // definindo a orientação da superfície para indicar que o lado da frente tem vértices no sentido horário
   abcg::glFrontFace(GL_CW);

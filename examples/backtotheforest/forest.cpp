@@ -50,16 +50,23 @@ void Forest::create(GLuint m_program) {
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
 
+  m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
+  m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
 
 }
 
-void Forest::paint(){
+void Forest::paint(Camera m_camera){
     abcg::glBindVertexArray(m_VAO);
 
  
     // a variável uniforme color é definida como (0.33f, 0.21f, 0.18f, 1.0f) (marrom) no vertex shader
+    abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
+                           &m_camera.getViewMatrix()[0][0]);
+    abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
+                           &m_camera.getProjMatrix()[0][0]);
+
     abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
 
     // Configuração de renderização de cada uma das árvores       

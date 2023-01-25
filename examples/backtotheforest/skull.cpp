@@ -49,6 +49,8 @@ void Skull::create(GLuint program) {
   abcg::glBindVertexArray(0);
 
   // Save location of uniform variables
+  m_viewMatrixLoc = abcg::glGetUniformLocation(program, "viewMatrix");
+  m_projMatrixLoc = abcg::glGetUniformLocation(program, "projMatrix");
   m_modelMatrixLoc = abcg::glGetUniformLocation(program, "modelMatrix");
   m_colorLoc = abcg::glGetUniformLocation(program, "color");
 }
@@ -71,8 +73,14 @@ void Skull::randomizeSkull() {
   s_size = glm::vec3(0.0006f);
 }
 
-void Skull::paint() {
+void Skull::paint(Camera m_camera) {
   abcg::glBindVertexArray(m_VAO);
+
+  // a variável uniforme color é definida como (0.33f, 0.21f, 0.18f, 1.0f) (marrom) no vertex shader
+  abcg::glUniformMatrix4fv(m_viewMatrixLoc, 1, GL_FALSE,
+                           &m_camera.getViewMatrix()[0][0]);
+  abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE,
+                           &m_camera.getProjMatrix()[0][0]);
 
   // Set model matrix as a translation matrix
   glm::mat4 model{1.0f};

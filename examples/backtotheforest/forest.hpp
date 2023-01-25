@@ -5,6 +5,7 @@
 
 #include "abcgOpenGL.hpp"
 #include "model.hpp"
+#include "camera.hpp"
 
 // variável com o número de árvores no cenário
 #define N_TREES 1500
@@ -12,7 +13,7 @@
 class Forest {
 public:
   void create(GLuint program);
-  void paint();
+  void paint(Camera m_camera);
   void destroy();
   void update(float deltaTime);
 
@@ -21,6 +22,8 @@ private:
   GLuint m_VBO{};
   GLuint m_EBO{};
 
+  GLint m_viewMatrixLocation{};
+  GLint m_projMatrixLocation{};
   GLint m_modelMatrixLocation{};
   GLint m_colorLocation{};
   
