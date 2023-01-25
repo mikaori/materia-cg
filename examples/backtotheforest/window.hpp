@@ -1,18 +1,14 @@
 #ifndef WINDOW_HPP_
 #define WINDOW_HPP_
 
-#include <random>
-
 #include "abcgOpenGL.hpp"
 
 #include "camera.hpp"
 #include "ground.hpp"
 #include "skull.hpp"
 #include "model.hpp"
+#include "forest.hpp"
 #include "gamedata.hpp"
-
-// variável com o número de árvores no cenário
-#define N_TREES 1500
 
 class Window : public abcg::OpenGLWindow {
   protected:
@@ -25,11 +21,8 @@ class Window : public abcg::OpenGLWindow {
     void onUpdate() override;
 
   private:
-    std::default_random_engine m_randomEngine;
-
-    float timeToChangeTree = 10.0;
     float timeToEndGame = 10.0;
-    
+      
     glm::ivec2 m_viewportSize{};
 
     GLuint m_VAO{};
@@ -55,22 +48,12 @@ class Window : public abcg::OpenGLWindow {
     // definição de um objeto da classe Skull para controlar a shuriken
     Skull m_skull;
 
+    // definição de um objeto da classe Tree para desenhar e controlar a posição das árvores
+    Forest m_forest;
+
     // definição de um objeto da classe GameData para controlar os estados do player
     GameData m_gameData;
 
-    struct Tree {
-      glm::vec3 m_position{};
-      glm::vec3 m_size{};
-    };
-
-    std::array<Tree, N_TREES> m_tree;
-
-    std::vector<Vertex> m_tree_vertex; // vertices lidos do arquivo OBJ
-    std::vector<GLuint> m_tree_index; // indices lidos do arquivo OBJ
-
-    void loadModelFromFileTree(std::string_view path); //carregamento do arquivo OBJ
-
-    void randomizeTree(Tree &tree);
 };
 
 #endif

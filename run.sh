@@ -1,2 +1,2 @@
 ./build.sh
-\ufabc\cg\abcg\build\bin\forestsimulate\forestsimulate
+/home/mikaori/ufabc/cg/materia-cg/build/bin/backtotheforest/backtotheforest
