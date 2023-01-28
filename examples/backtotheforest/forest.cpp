@@ -6,9 +6,15 @@
 #include <fstream>
 #include <glm/gtx/fast_trigonometry.hpp>
 
-void Forest::create(GLuint m_program) {
+void Forest::create() {
+
   auto const &assetsPath{abcg::Application::getAssetsPath()};
   
+  m_program =
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/forest.vert",
+                                  .stage = abcg::ShaderStage::Vertex},
+                                 {.source = assetsPath + "shaders/forest.frag",
+                                  .stage = abcg::ShaderStage::Fragment}});
   for (auto &tree : m_tree) {
     randomizeTree(tree);
   }
@@ -38,11 +44,25 @@ void Forest::create(GLuint m_program) {
   abcg::glBindVertexArray(m_VAO);
 
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+
+    // Bind vertex attributes
   auto const positionAttribute{
       abcg::glGetAttribLocation(m_program, "inPosition")};
-  abcg::glEnableVertexAttribArray(positionAttribute);
-  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(Vertex), nullptr);
+  if (positionAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(positionAttribute);
+    abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex), nullptr);
+  }
+
+  auto const normalAttribute{abcg::glGetAttribLocation(m_program, "inNormal")};
+  if (normalAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(normalAttribute);
+    auto const offset{offsetof(Vertex, normal)};
+    abcg::glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex),
+                                reinterpret_cast<void *>(offset));
+  }
+  
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
@@ -53,11 +73,13 @@ void Forest::create(GLuint m_program) {
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
+  m_lightDirLocation = abcg::glGetUniformLocation(m_program, "lightDirWorldSpace");
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
+  m_normalMatrixLocation = abcg::glGetUniformLocation(m_program, "normalMatrix");
 
 }
 
-void Forest::paint(Camera m_camera){
+void Forest::paint(Camera m_camera, Moon m_moon){
     abcg::glBindVertexArray(m_VAO);
 
  
@@ -66,6 +88,7 @@ void Forest::paint(Camera m_camera){
                            &m_camera.getViewMatrix()[0][0]);
     abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
                            &m_camera.getProjMatrix()[0][0]);
+    abcg::glUniform4fv(m_lightDirLocation, 1, &m_moon.m_lightDir.x);
 
     abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
 
@@ -178,3 +201,12 @@ void Forest::destroy() {
   abcg::glDeleteBuffers(1, &m_VBO);
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
+
+std::array<glm::vec4, 3> Forest::lightProperties(){
+  return {m_Ia, m_Id, m_Is};
+}
+
+std::array<glm::vec4, 3> Forest::materialProperties(){
+  return {m_Ka, m_Kd, m_Ks};
+}
+

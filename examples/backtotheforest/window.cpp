@@ -16,9 +16,9 @@ void Window::onCreate() {
 
   // criação do program
   m_program =
-      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/theforest.vert",
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/default.vert",
                                   .stage = abcg::ShaderStage::Vertex},
-                                 {.source = assetsPath + "shaders/theforest.frag",
+                                 {.source = assetsPath + "shaders/default.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
   // inicializa o VAO/VBO do chão
@@ -28,7 +28,7 @@ void Window::onCreate() {
   m_skull.create(m_program);
 
   // inicializa o VAO/VBO da floresta
-  m_forest.create(m_program);
+  m_forest.create();
 
   // pega a localização das variáveis uniformes
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
@@ -60,7 +60,7 @@ void Window::onPaint() {
   m_skull.paint(m_camera);
 
   // Desenha as árvores
-  m_forest.paint(m_camera);
+  m_forest.paint(m_camera, m_moon);
 
   // definindo a orientação da superfície para indicar que o lado da frente tem vértices no sentido horário
   abcg::glFrontFace(GL_CW);

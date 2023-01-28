@@ -9,6 +9,7 @@
 #include "model.hpp"
 #include "forest.hpp"
 #include "gamedata.hpp"
+#include "moon.hpp"
 
 class Window : public abcg::OpenGLWindow {
   protected:
@@ -53,6 +54,9 @@ class Window : public abcg::OpenGLWindow {
 
     // definição de um objeto da classe GameData para controlar os estados do player
     GameData m_gameData;
+
+    // definição da iluminação global no cenário, como se fosse a iluminação de uma lua
+    Moon m_moon;
 
 };
 
