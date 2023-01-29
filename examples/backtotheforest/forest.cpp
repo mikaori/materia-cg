@@ -66,7 +66,6 @@ void Forest::create() {
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
-  m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
   m_normalMatrixLocation =
       abcg::glGetUniformLocation(m_program, "normalMatrix");
 
@@ -81,16 +80,12 @@ void Forest::paint(Camera m_camera, Moon m_moon) {
 
   materialBindTexture();
 
-  // a variável uniforme color é definida como (0.33f, 0.21f, 0.18f, 1.0f)
-  // (marrom) no vertex shader
   abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
                            &m_camera.getViewMatrix()[0][0]);
   abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
                            &m_camera.getProjMatrix()[0][0]);
   abcg::glUniform1i(m_diffuseTexLocation, 0);
 
-
-  abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
   
   m_moon.loadLocation(m_program);
   m_moon.lightBind();

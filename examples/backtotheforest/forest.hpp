@@ -25,9 +25,7 @@ private:
   GLint m_viewMatrixLocation{};
   GLint m_projMatrixLocation{};
   GLint m_modelMatrixLocation{};
-  GLint m_colorLocation{};
   GLint m_normalMatrixLocation{};
-
   GLint m_diffuseTexLocation{};
 
   std::default_random_engine m_randomEngine;

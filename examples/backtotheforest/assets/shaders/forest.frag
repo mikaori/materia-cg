@@ -2,7 +2,6 @@
 
 precision mediump float;
 
-in vec4 fragColor;
 in float vis;
 in vec3 fragN;
 in vec3 fragL;

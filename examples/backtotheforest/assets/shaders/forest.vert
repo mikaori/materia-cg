@@ -8,7 +8,6 @@ layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
 
 // variável para definir a cor do objeto
-uniform vec4 color;
 uniform vec4 lightDirWorldSpace;
 
 // matrizes de transformação geométrica (matriz de modelo, visão e projeção)
@@ -21,7 +20,6 @@ uniform mat3 normalMatrix;
 out vec3 fragV;
 out vec3 fragL;
 out vec3 fragN;
-out vec4 fragColor;
 out float vis;
 out vec2 fragTexCoord;
 out vec3 fragPObj;
@@ -43,7 +41,6 @@ void main() {
   vis = clamp(vis, 0.0, 1.0);
 
   // altera o atributo de acordo com a intensidade definida em i
-  fragColor = color;
   fragL = L;
   fragV = -P;
   fragN = N;
