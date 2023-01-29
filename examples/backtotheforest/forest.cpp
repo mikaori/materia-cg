@@ -63,13 +63,10 @@ void Forest::create() {
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
 
-  m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
-  m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
+
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_normalMatrixLocation =
       abcg::glGetUniformLocation(m_program, "normalMatrix");
-
-  m_diffuseTexLocation = abcg::glGetUniformLocation(m_program, "diffuseTex");
 
   materialLoadLocation(); 
 }
@@ -80,13 +77,9 @@ void Forest::paint(Camera m_camera, Moon m_moon) {
 
   materialBindTexture();
 
-  abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getViewMatrix()[0][0]);
-  abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
-                           &m_camera.getProjMatrix()[0][0]);
-  abcg::glUniform1i(m_diffuseTexLocation, 0);
+  m_camera.loadLocation(m_program);
+  m_camera.bind();
 
-  
   m_moon.loadLocation(m_program);
   m_moon.lightBind();
 

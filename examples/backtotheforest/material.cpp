@@ -2,6 +2,7 @@
 #include <filesystem>
 
 void Material::materialLoadLocation() {
+  m_diffuseTexLocation = abcg::glGetUniformLocation(m_program, "diffuseTex");
   m_KaLocation = abcg::glGetUniformLocation(m_program, "Ka");
   m_KdLocation = abcg::glGetUniformLocation(m_program, "Kd");
   m_KsLocation = abcg::glGetUniformLocation(m_program, "Ks");
@@ -10,6 +11,7 @@ void Material::materialLoadLocation() {
 }
 
 void Material::materialBindLocation() {
+  abcg::glUniform1i(m_diffuseTexLocation, 0);
   abcg::glUniform4fv(m_KaLocation, 1, getKa());
   abcg::glUniform4fv(m_KdLocation, 1, getKd());
   abcg::glUniform4fv(m_KdLocation, 1, getKs());

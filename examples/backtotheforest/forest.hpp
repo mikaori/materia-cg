@@ -22,11 +22,8 @@ public:
   glm::vec4 m_lightDir{-1.0f, -1.0f, -1.0f, 0.0f};
 
 private:
-  GLint m_viewMatrixLocation{};
-  GLint m_projMatrixLocation{};
   GLint m_modelMatrixLocation{};
   GLint m_normalMatrixLocation{};
-  GLint m_diffuseTexLocation{};
 
   std::default_random_engine m_randomEngine;
 

@@ -32,6 +32,8 @@ protected:
   GLint m_mappingModeLocation{};
   int mappingMode = 3;
 
+  GLint m_diffuseTexLocation{};
+
   void materialLoadLocation();
   void materialBindLocation();
   void materialLoadProperties(const std::string, tinyobj::ObjReader);

@@ -58,3 +58,14 @@ void Camera::pan(float speed) {
 
 // retorna a posição da câmera
 glm::vec3 Camera::getCameraPosition() { return m_eye; }
+
+void Camera::loadLocation(GLint m_program){
+  m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
+  m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
+}
+void Camera::bind(){
+  abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
+                           &getViewMatrix()[0][0]);
+  abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
+                           &getProjMatrix()[0][0]);
+}
