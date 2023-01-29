@@ -8,6 +8,7 @@
 #include "material.hpp"
 #include "model.hpp"
 #include "moon.hpp"
+#include "skull.hpp"
 
 // variável com o número de árvores no cenário
 #define N_TREES 1500
@@ -15,7 +16,7 @@
 class Forest : public Material {
 public:
   void create();
-  void paint(Camera m_camera, Moon m_moon);
+  void paint(Camera m_camera, Moon m_moon, Skull m_skull);
   void destroy();
   void update(float deltaTime);
   float m_shininess = 25.0f;

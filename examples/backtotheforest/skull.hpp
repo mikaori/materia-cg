@@ -5,14 +5,16 @@
 #include "camera.hpp"
 #include "material.hpp"
 #include "moon.hpp"
+#include "light.hpp"
 
-class Skull: public Material {
+class Skull: public Light,Material  {
 public:
   void create();
   void paint(Camera m_camera, Moon m_moon);
   void destroy();
   void update(float deltaTime, Camera camera);
   bool touch(glm::vec3 position_verify);
+  void loadLocation(GLint);
 
 private:
   GLint m_modelMatrixLocation{};

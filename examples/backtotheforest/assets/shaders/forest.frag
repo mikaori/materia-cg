@@ -4,20 +4,26 @@ precision mediump float;
 
 in float vis;
 in vec3 fragN;
-in vec3 fragL;
+in vec3 fragLMoon;
+in vec3 fragLSkull;
 in vec3 fragV;
 in vec2 fragTexCoord;
 in vec3 fragPObj;
 in vec3 fragNObj;
 
 // Light properties
-uniform vec4 Ia, Id, Is;
+uniform vec4 IaMoon, IdMoon, IsMoon;
+uniform vec4 lightDirWorldSpaceMoon;
+uniform float lightDiameterMoon;
+
+uniform vec4 IaSkull, IdSkull, IsSkull;
+uniform vec4 lightDirWorldSpaceSkull;
+uniform float lightDiameterSkull;
+
 
 // Material properties
 uniform vec4 Ka, Kd, Ks;
 uniform float shininess;
-uniform vec4 lightDirWorldSpace;
-uniform float lightDiameter;
 
 // Diffuse texture sampler
 uniform sampler2D diffuseTex;
@@ -28,7 +34,7 @@ uniform int mappingMode;
 
 out vec4 outColor;
 
-float IntensityLight(){
+float IntensityLight(vec3 fragL, vec4 lightDirWorldSpace, float lightDiameter ){
   float intensityLight = lightDiameter/length(fragL-lightDirWorldSpace.xyz);
   if(intensityLight < 0.0){
     intensityLight = -intensityLight;
@@ -36,7 +42,7 @@ float IntensityLight(){
   return intensityLight > 1.0 ? 1.0 : intensityLight;
 }
 
-vec4 Phong(vec3 N, vec3 L, vec3 V, vec2 texCoord) {
+vec4 Phong(vec3 N, vec3 L, vec3 V, vec2 texCoord, vec4 Ia, vec4 Id, vec4 Is) {
   
   N = normalize(N);
   L = normalize(L);
@@ -107,7 +113,10 @@ vec2 TextCoordinate(){
 void main() {
 
   vec2 textCord = TextCoordinate();
-  vec4 color = Phong(fragN, fragL, fragV, textCord) * IntensityLight();
+  vec4 colorMoon = Phong(fragN, fragLMoon, fragV, textCord, IaMoon, IdMoon, IsMoon) * IntensityLight(fragLMoon, lightDirWorldSpaceMoon, lightDiameterMoon);
+  vec4 colorSkull = Phong(fragN, fragLSkull, fragV, textCord, IaSkull, IdSkull, IsSkull) * IntensityLight(fragLSkull, lightDirWorldSpaceSkull, lightDiameterSkull);
+
+  vec4 color = colorMoon + colorSkull;
 
   // define a cor final do fragmento
   if (gl_FrontFacing) {

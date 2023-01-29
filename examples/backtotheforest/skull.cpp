@@ -7,12 +7,15 @@
 #include <unordered_map>
 
 void Skull::create() {
+  // Light properties
+  Ia = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
+  Id = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
+  Is = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
+  lightDiameter = 1.0f;
 
-  // Material properties
-  Ka = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-  Kd = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-  Ks = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-  shininess = 25.0f;
+  shininess = 1.0f;
+
+  mappingMode = 2;
 
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
@@ -22,9 +25,9 @@ void Skull::create() {
                                  {.source = assetsPath + "shaders/skull.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  materialLoadModelFromFile(assetsPath + "/obj/skull/Skull.obj", true);
-
   randomizeSkull();
+  
+  materialLoadModelFromFile(assetsPath + "/obj/skull/Skull.obj", true);
 
   modelCreateBuffers();
 
@@ -63,6 +66,7 @@ void Skull::create() {
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_normalMatrixLocation =
       abcg::glGetUniformLocation(m_program, "normalMatrix");
+  materialLoadLocation();
 }
 
 void Skull::randomizeSkull() {
@@ -95,8 +99,10 @@ void Skull::paint(Camera m_camera, Moon m_moon) {
   m_moon.loadLocation(m_program);
   m_moon.lightBind();
 
-  materialBindLocation();
+  loadLocation(m_program);
+  lightBind();
 
+  materialBindLocation();
 
   // Set model matrix as a translation matrix
   glm::mat4 model{1.0f};
@@ -105,11 +111,11 @@ void Skull::paint(Camera m_camera, Moon m_moon) {
   model = glm::scale(model, s_size);
 
   abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  
+
   auto const modelViewMatrix{glm::mat3(m_camera.getViewMatrix() * model)};
   auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
   abcg::glUniformMatrix3fv(m_normalMatrixLocation, 1, GL_FALSE,
-                             &normalMatrix[0][0]);
+                           &normalMatrix[0][0]);
 
   abcg::glDrawElements(GL_TRIANGLES, m_index.size(), GL_UNSIGNED_INT, nullptr);
 
@@ -135,7 +141,9 @@ void Skull::update(float deltaTime, Camera camera) {
                                   // posição da câmera e a posição da shuriken
 
   s_position += (diffVectorPosition * glm::vec3(1.0f, 0.0f, 1.0f)) * deltaTime *
-                1.5f; // velocidade no qual a shuriren se move
+                1.3f; // velocidade no qual a shuriren se move
+
+  lightDirection = glm::vec4{s_position, 1.0f};
 
   s_rotation += 20.0f * deltaTime; // velocidade de rotação
 }
@@ -145,4 +153,14 @@ void Skull::update(float deltaTime, Camera camera) {
 /// @return posição da shuriken
 bool Skull::touch(glm::vec3 position_verify) {
   return glm::distance(position_verify, s_position) < 0.5f;
+}
+
+void Skull::loadLocation(GLint m_program) {
+  m_IaLocation = abcg::glGetUniformLocation(m_program, "IaSkull");
+  m_IdLocation = abcg::glGetUniformLocation(m_program, "IdSkull");
+  m_IsLocation = abcg::glGetUniformLocation(m_program, "IsSkull");
+  m_lightDiameterLocation =
+      abcg::glGetUniformLocation(m_program, "lightDiameterSkull");
+  m_lightDirLocation =
+      abcg::glGetUniformLocation(m_program, "lightDirWorldSpaceSkull");
 }

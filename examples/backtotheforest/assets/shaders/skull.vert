@@ -8,7 +8,8 @@ layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
 
 // variável para definir a cor do objeto
-uniform vec4 lightDirWorldSpace;
+uniform vec4 lightDirWorldSpaceMoon;
+uniform vec4 lightDirWorldSpaceSkull;
 
 // matrizes de transformação geométrica (matriz de modelo, visão e projeção)
 uniform mat4 modelMatrix;
@@ -18,7 +19,8 @@ uniform mat3 normalMatrix;
 
 // atributo de saída que é uma cor RGBA
 out vec3 fragV;
-out vec3 fragL;
+out vec3 fragLMoon;
+out vec3 fragLSkull;
 out vec3 fragN;
 out float vis;
 out vec2 fragTexCoord;
@@ -34,14 +36,16 @@ void main() {
 
   vec3 P = (viewMatrix * modelMatrix * vec4(inPosition, 1.0)).xyz;
   vec3 N = normalMatrix * inNormal;
-  vec3 L = -(viewMatrix * lightDirWorldSpace).xyz;
+  vec3 LMoon = -(viewMatrix * lightDirWorldSpaceMoon).xyz;
+  vec3 LSkull = -(viewMatrix * lightDirWorldSpaceSkull).xyz;
 
   float dis = length(posEyeSpace.xyz);
   vis = exp(-pow(dis*density, gradient));
   vis = clamp(vis, 0.0, 1.0);
 
   // altera o atributo de acordo com a intensidade definida em i
-  fragL = L;
+  fragLMoon = LMoon;
+  fragLSkull = LSkull;
   fragV = -P;
   fragN = N;
   fragTexCoord = inTexCoord;

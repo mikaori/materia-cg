@@ -9,11 +9,11 @@ void Moon::create() {
 }
 
 void Moon::loadLocation(GLint m_program){
-  m_IaLocation = abcg::glGetUniformLocation(m_program, "Ia");
-  m_IdLocation = abcg::glGetUniformLocation(m_program, "Id");
-  m_IsLocation = abcg::glGetUniformLocation(m_program, "Is");
+  m_IaLocation = abcg::glGetUniformLocation(m_program, "IaMoon");
+  m_IdLocation = abcg::glGetUniformLocation(m_program, "IdMoon");
+  m_IsLocation = abcg::glGetUniformLocation(m_program, "IsMoon");
   m_lightDiameterLocation =
-      abcg::glGetUniformLocation(m_program, "lightDiameter");
+      abcg::glGetUniformLocation(m_program, "lightDiameterMoon");
   m_lightDirLocation =
-      abcg::glGetUniformLocation(m_program, "lightDirWorldSpace");
+      abcg::glGetUniformLocation(m_program, "lightDirWorldSpaceMoon");
 }

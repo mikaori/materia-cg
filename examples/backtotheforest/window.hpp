@@ -22,7 +22,7 @@ protected:
   void onUpdate() override;
 
 private:
-  float timeToEndGame = 100000000.0;
+  float timeToEndGame = 10.0;
 
   glm::ivec2 m_viewportSize{};
 

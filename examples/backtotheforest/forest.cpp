@@ -13,7 +13,7 @@ void Forest::create() {
   Ka = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
   Kd = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
   Ks = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-  shininess = 25.0f;
+  shininess = 1.0f;
 
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
@@ -22,6 +22,7 @@ void Forest::create() {
                                   .stage = abcg::ShaderStage::Vertex},
                                  {.source = assetsPath + "shaders/forest.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
+  
   for (auto &tree : m_tree) {
     randomizeTree(tree);
   }
@@ -71,7 +72,7 @@ void Forest::create() {
   materialLoadLocation(); 
 }
 
-void Forest::paint(Camera m_camera, Moon m_moon) {
+void Forest::paint(Camera m_camera, Moon m_moon, Skull m_skull) {
   abcg::glUseProgram(m_program);
   abcg::glBindVertexArray(m_VAO);
 
@@ -82,6 +83,9 @@ void Forest::paint(Camera m_camera, Moon m_moon) {
 
   m_moon.loadLocation(m_program);
   m_moon.lightBind();
+
+  m_skull.loadLocation(m_program);
+  m_skull.lightBind();
 
   materialBindLocation();
 

@@ -63,7 +63,7 @@ void Window::onPaint() {
   m_skull.paint(m_camera, m_moon);
 
   // Desenha as árvores
-  m_forest.paint(m_camera, m_moon);
+  m_forest.paint(m_camera, m_moon, m_skull);
 
   // definindo a orientação da superfície para indicar que o lado da frente tem
   // vértices no sentido horário
