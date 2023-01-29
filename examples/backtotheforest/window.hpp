@@ -22,7 +22,7 @@ class Window : public abcg::OpenGLWindow {
     void onUpdate() override;
 
   private:
-    float timeToEndGame = 10.0;
+    float timeToEndGame = 100000000.0;
       
     glm::ivec2 m_viewportSize{};
 

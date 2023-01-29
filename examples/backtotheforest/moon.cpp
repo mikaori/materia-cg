@@ -1,5 +1,9 @@
 #include "moon.hpp"
 
-std::array<glm::vec4, 3> Moon::lightProperties(){
-  return {m_Ia, m_Id, m_Is};
+void Moon::create() {
+  Ia = glm::vec4{0.3f};
+  Is = glm::vec4{0.3f};
+  Id = glm::vec4{0.3f};
+  lightDirection = glm::vec4{0.0f, 100.0f, 0.0f, 1.0f};
+  lightDiameter = 1000.0f;
 }

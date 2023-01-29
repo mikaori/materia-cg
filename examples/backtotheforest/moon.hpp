@@ -4,18 +4,14 @@
 #include <random>
 
 #include "abcgOpenGL.hpp"
+#include "light.hpp"
 
-class Moon {
+class Moon: public Light {
 public:
-  std::array<glm::vec4, 3> lightProperties();
-  float m_shininess = 25.0f;
-  glm::vec4 m_lightDir{1.0f, -1.0f, 1.0f, 1.0f};
+  void create();
 
 private:
-  glm::vec4 m_Ia{1.0f};
-  glm::vec4 m_Id{1.0f};
-  glm::vec4 m_Is{1.0f};
-
+  
 };
 
 #endif

@@ -1,19 +1,24 @@
 #version 300 es
 
+precision mediump float;
+
 // atributo de entrada que representa a posição do vértice
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 
 // variável para definir a cor do objeto
 uniform vec4 color;
+uniform vec4 lightDirWorldSpace;
+
+uniform mat3 normalMatrix;
 
 // matrizes de transformação geométrica (matriz de modelo, visão e projeção)
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix; // fornece efeito de perspectiva e dá a sensação de que a câmera é o player
-uniform mat3 normalMatrix;
 
-uniform vec4 lightDirWorldSpace;
+
+
 
 // atributo de saída que é uma cor RGBA
 out vec3 fragV;

@@ -8,6 +8,12 @@
 
 void Forest::create() {
 
+  // Material properties
+  Ka = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  Kd = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  Ks = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  shininess = 25.0f;
+
   auto const &assetsPath{abcg::Application::getAssetsPath()};
   
   m_program =
@@ -19,7 +25,7 @@ void Forest::create() {
     randomizeTree(tree);
   }
 
-  loadModelFromFileTree(assetsPath + "Tree1.obj");
+  loadModelFromFileTree(assetsPath + "Tree1.obj", false);
 
   // Generate VBO
   abcg::glGenBuffers(1, &m_VBO);
@@ -37,12 +43,16 @@ void Forest::create() {
                      m_index.data(), GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+  // Release previous VAO
+  abcg::glDeleteVertexArrays(1, &m_VAO);
+
   // Create VAO
   abcg::glGenVertexArrays(1, &m_VAO);
 
   // Bind vertex attributes to current VAO
   abcg::glBindVertexArray(m_VAO);
 
+  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
     // Bind vertex attributes
@@ -65,8 +75,6 @@ void Forest::create() {
   
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
 
@@ -76,10 +84,19 @@ void Forest::create() {
   m_lightDirLocation = abcg::glGetUniformLocation(m_program, "lightDirWorldSpace");
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
   m_normalMatrixLocation = abcg::glGetUniformLocation(m_program, "normalMatrix");
+  m_IaLocation = abcg::glGetUniformLocation(m_program, "Ia");
+  m_IdLocation = abcg::glGetUniformLocation(m_program, "Id");
+  m_IsLocation = abcg::glGetUniformLocation(m_program, "Is");
+  m_KaLocation = abcg::glGetUniformLocation(m_program, "Ka");
+  m_KdLocation = abcg::glGetUniformLocation(m_program, "Kd");
+  m_KsLocation = abcg::glGetUniformLocation(m_program, "Ks");
+  m_shininessLocation = abcg::glGetUniformLocation(m_program, "shininess");
+  m_lightDiameterLocation = abcg::glGetUniformLocation(m_program, "lightDiameter");
 
 }
 
 void Forest::paint(Camera m_camera, Moon m_moon){
+    abcg::glUseProgram(m_program);
     abcg::glBindVertexArray(m_VAO);
 
  
@@ -88,9 +105,19 @@ void Forest::paint(Camera m_camera, Moon m_moon){
                            &m_camera.getViewMatrix()[0][0]);
     abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,
                            &m_camera.getProjMatrix()[0][0]);
-    abcg::glUniform4fv(m_lightDirLocation, 1, &m_moon.m_lightDir.x);
+    abcg::glUniform4fv(m_lightDirLocation, 1, m_moon.getLightDirection());
 
     abcg::glUniform4f(m_colorLocation, 0.33f, 0.21f, 0.18f, 1.0f);
+
+    abcg::glUniform4fv(m_IaLocation, 1, m_moon.getIa());
+    abcg::glUniform4fv(m_IdLocation, 1, m_moon.getId());
+    abcg::glUniform4fv(m_IdLocation, 1, m_moon.getIs());
+    abcg::glUniform4fv(m_KaLocation, 1, getKa());
+    abcg::glUniform4fv(m_KdLocation, 1, getKd());
+    abcg::glUniform4fv(m_KdLocation, 1, getKs());
+    abcg::glUniform1f(m_shininessLocation, getShininess());
+    abcg::glUniform1f(m_lightDiameterLocation, m_moon.getLightDiameter());
+
 
     // Configuração de renderização de cada uma das árvores       
     for (auto &tree : m_tree)
@@ -100,8 +127,12 @@ void Forest::paint(Camera m_camera, Moon m_moon){
         model = glm::translate(model, tree.m_position);
         model = glm::scale(model, tree.m_size);
 
-        // envia a matriz modelo para a variável m_modelMatrix no vertex shader
+        // envia a matriz modelo para a variável m_modelMatrix no vertex shader        
         abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+
+        auto const modelViewMatrix{glm::mat3(m_camera.getViewMatrix() * model)};
+        auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+        abcg::glUniformMatrix3fv(m_normalMatrixLocation, 1, GL_FALSE, &normalMatrix[0][0]);
         
         // comando de renderização
         abcg::glDrawElements(GL_TRIANGLES, m_index.size(), GL_UNSIGNED_INT,
@@ -143,7 +174,7 @@ void Forest::randomizeTree(Tree &tree) {
   tree.m_size = glm::vec3(distSizeXZ(m_randomEngine));
 }
 
-void Forest::loadModelFromFileTree(std::string_view path) {
+void Forest::loadModelFromFileTree(std::string_view path, bool standardize) {
   tinyobj::ObjReader reader;
 
   if (!reader.ParseFromFile(path.data())) {
@@ -158,11 +189,13 @@ void Forest::loadModelFromFileTree(std::string_view path) {
     fmt::print("Warning: {}\n", reader.Warning());
   }
 
-  auto const &attributes{reader.GetAttrib()};
+  auto const &attrib{reader.GetAttrib()};
   auto const &shapes{reader.GetShapes()};
 
   m_vertex.clear();
   m_index.clear();
+
+  m_hasNormals = false;
 
   // A key:value map with key=Vertex and value=index
   std::unordered_map<Vertex, GLuint> hash{};
@@ -176,11 +209,21 @@ void Forest::loadModelFromFileTree(std::string_view path) {
 
       // Vertex position
       auto const startIndex{3 * index.vertex_index};
-      auto const vx{attributes.vertices.at(startIndex + 0)};
-      auto const vy{attributes.vertices.at(startIndex + 1)};
-      auto const vz{attributes.vertices.at(startIndex + 2)};
+      glm::vec3 position{attrib.vertices.at(startIndex + 0),
+                         attrib.vertices.at(startIndex + 1),
+                         attrib.vertices.at(startIndex + 2)};
 
-      Vertex const vertex{.position = {vx, vy, vz}};
+      // Vertex normal
+      glm::vec3 normal{};
+      if (index.normal_index >= 0) {
+        m_hasNormals = true;
+        auto const normalStartIndex{3 * index.normal_index};
+        normal = {attrib.normals.at(normalStartIndex + 0),
+                  attrib.normals.at(normalStartIndex + 1),
+                  attrib.normals.at(normalStartIndex + 2)};
+      }
+
+      Vertex const vertex{.position = position, .normal = normal};
 
       // If map doesn't contain this vertex
       if (!hash.contains(vertex)) {
@@ -193,6 +236,14 @@ void Forest::loadModelFromFileTree(std::string_view path) {
       m_index.push_back(hash[vertex]);
     }
   }
+
+  if (standardize) {
+    Forest::standardize();
+  }
+
+  if (!m_hasNormals) {
+    computeNormals();
+  }
 }
 
 /// @brief liberar os recursos do OpenGL que foram alocados em onCreate ou durante a aplicação
@@ -202,11 +253,53 @@ void Forest::destroy() {
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
 
-std::array<glm::vec4, 3> Forest::lightProperties(){
-  return {m_Ia, m_Id, m_Is};
+void Forest::computeNormals() {
+  // Clear previous vertex normals
+  for (auto &vertex : m_vertex) {
+    vertex.normal = glm::vec3(0.0f);
+  }
+
+  // Compute face normals
+  for (auto const offset : iter::range(0UL, m_index.size(), 3UL)) {
+    // Get face vertices
+    auto &a{m_vertex.at(m_index.at(offset + 0))};
+    auto &b{m_vertex.at(m_index.at(offset + 1))};
+    auto &c{m_vertex.at(m_index.at(offset + 2))};
+
+    // Compute normal
+    auto const edge1{b.position - a.position};
+    auto const edge2{c.position - b.position};
+    auto const normal{glm::cross(edge1, edge2)};
+
+    // Accumulate on vertices
+    a.normal += normal;
+    b.normal += normal;
+    c.normal += normal;
+  }
+
+  // Normalize
+  for (auto &vertex : m_vertex) {
+    vertex.normal = glm::normalize(vertex.normal);
+  }
+
+  m_hasNormals = true;
 }
 
-std::array<glm::vec4, 3> Forest::materialProperties(){
-  return {m_Ka, m_Kd, m_Ks};
-}
+void Forest::standardize() {
+  // Center to origin and normalize largest bound to [-1, 1]
 
+  // Get bounds
+  glm::vec3 max(std::numeric_limits<float>::lowest());
+  glm::vec3 min(std::numeric_limits<float>::max());
+  for (auto const &vertex : m_vertex) {
+    max = glm::max(max, vertex.position);
+    min = glm::min(min, vertex.position);
+  }
+
+  // Center and scale
+  auto const center{(min + max) / 2.0f};
+  auto const scaling{2.0f / glm::length(max - min)};
+  for (auto &vertex : m_vertex) {
+    vertex.position = (vertex.position - center) * scaling;
+  }
+}

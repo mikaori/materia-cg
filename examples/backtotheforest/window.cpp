@@ -30,6 +30,8 @@ void Window::onCreate() {
   // inicializa o VAO/VBO da floresta
   m_forest.create();
 
+  m_moon.create();
+
   // pega a localização das variáveis uniformes
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
@@ -54,9 +56,11 @@ void Window::onPaint() {
                            &m_camera.getProjMatrix()[0][0]);
 
   // Desenha o chão
+  abcg::glUseProgram(m_program);
   m_ground.paint(m_camera);
 
   // Desenha a shuriken
+  abcg::glUseProgram(m_program);
   m_skull.paint(m_camera);
 
   // Desenha as árvores
