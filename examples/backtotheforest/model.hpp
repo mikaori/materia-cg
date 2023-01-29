@@ -21,4 +21,27 @@ template <> struct std::hash<Vertex> {
   }
 };
 
+class Model {
+public:
+  void modelComputeNormals();
+  void modelStandardize();
+  void modelLoadModelFromFile(
+      tinyobj::ObjReader reader,
+      bool standardize = true); // carregamento do arquivo OBJ
+protected:
+  GLuint m_VAO{};
+  GLuint m_VBO{};
+  GLuint m_EBO{};
+  GLuint m_program{};
+  GLuint m_diffuseTexture{};
+
+  std::vector<Vertex> m_vertex; // vertices lidos do arquivo OBJ
+  std::vector<GLuint> m_index;  // indices lidos do arquivo OBJ
+
+  bool m_hasNormals{false};
+  bool m_hasTexCoords{false};
+
+  void modelCreateBuffers();
+};
+
 #endif

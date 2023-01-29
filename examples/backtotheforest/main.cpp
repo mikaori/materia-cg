@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     window.setOpenGLSettings({.samples = 4});
     window.setWindowSettings({
         .width = 1000,
-        .height =1000,
+        .height = 1000,
         .title = "The Forest",
     });
 

@@ -2,8 +2,8 @@
 #define SKULL_HPP_
 
 #include "abcgOpenGL.hpp"
-#include "model.hpp"
 #include "camera.hpp"
+#include "model.hpp"
 
 class Skull {
 public:
@@ -23,17 +23,17 @@ private:
   GLint m_modelMatrixLoc{};
   GLint m_colorLoc{};
 
-  void loadModelFromFileSkull(std::string_view path); //carregamento do arquivo OBJ
+  void
+  loadModelFromFileSkull(std::string_view path); // carregamento do arquivo OBJ
 
   void randomizeSkull();
 
   glm::vec3 s_position{};
   float s_rotation{};
   glm::vec3 s_size{};
-  
-  std::vector<Vertex> m_vertex; // vertices lidos do arquivo OBJ
-  std::vector<GLuint> m_index; // indices lidos do arquivo OBJ
 
+  std::vector<Vertex> m_vertex; // vertices lidos do arquivo OBJ
+  std::vector<GLuint> m_index;  // indices lidos do arquivo OBJ
 };
 
 #endif

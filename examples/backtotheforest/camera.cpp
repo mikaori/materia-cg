@@ -9,12 +9,10 @@ void Camera::computeProjectionMatrix(glm::vec2 const &size) {
   m_projMatrix = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 8.0f);
 }
 
-
 // computa as alterações realizadas em m_eye e m_at
 void Camera::computeViewMatrix() {
   m_viewMatrix = glm::lookAt(m_eye, m_at, m_up);
 }
-
 
 // desloca os pontos m_eye e m_at para frente ou para trás na direção de visão
 void Camera::dolly(float speed) {
@@ -28,12 +26,12 @@ void Camera::dolly(float speed) {
   computeViewMatrix();
 }
 
-
-// desloca os pontos m_eye e m_at nas laterais de acordo com a direção do vetor left
+// desloca os pontos m_eye e m_at nas laterais de acordo com a direção do vetor
+// left
 void Camera::truck(float speed) {
   // Compute forward vector (view direction)
   auto const forward{glm::normalize(m_at - m_eye)};
-  
+
   // Compute vector to the left
   auto const left{glm::cross(m_up, forward)};
 
@@ -59,6 +57,4 @@ void Camera::pan(float speed) {
 }
 
 // retorna a posição da câmera
-glm::vec3 Camera::getCameraPosition(){
-  return m_eye;
-}
+glm::vec3 Camera::getCameraPosition() { return m_eye; }

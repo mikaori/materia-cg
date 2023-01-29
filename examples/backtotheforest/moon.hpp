@@ -6,12 +6,12 @@
 #include "abcgOpenGL.hpp"
 #include "light.hpp"
 
-class Moon: public Light {
+class Moon : public Light {
 public:
   void create();
+  void loadLocation(GLint);
 
 private:
-  
 };
 
 #endif
