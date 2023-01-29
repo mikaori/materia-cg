@@ -25,7 +25,7 @@ void Window::onCreate() {
   m_ground.create(m_program);
 
   // inicializa o VAO/VBO da shuriken
-  m_skull.create(m_program);
+  m_skull.create();
 
   // inicializa o VAO/VBO da floresta
   m_forest.create();
@@ -60,7 +60,7 @@ void Window::onPaint() {
 
   // Desenha a shuriken
   abcg::glUseProgram(m_program);
-  m_skull.paint(m_camera);
+  m_skull.paint(m_camera, m_moon);
 
   // Desenha as árvores
   m_forest.paint(m_camera, m_moon);

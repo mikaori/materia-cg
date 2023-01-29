@@ -6,51 +6,63 @@
 #include <iostream>
 #include <unordered_map>
 
-void Skull::create(GLuint program) {
+void Skull::create() {
+
+  // Material properties
+  Ka = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  Kd = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  Ks = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
+  shininess = 25.0f;
 
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
-  loadModelFromFileSkull(assetsPath + "Skull.obj");
+  m_program =
+      abcg::createOpenGLProgram({{.source = assetsPath + "shaders/skull.vert",
+                                  .stage = abcg::ShaderStage::Vertex},
+                                 {.source = assetsPath + "shaders/skull.frag",
+                                  .stage = abcg::ShaderStage::Fragment}});
+
+  materialLoadModelFromFile(assetsPath + "/obj/skull/Skull.obj", true);
 
   randomizeSkull();
 
-  // Generate VBO
-  abcg::glGenBuffers(1, &m_VBO);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertex.at(0)) * m_vertex.size(),
-                     m_vertex.data(), GL_STATIC_DRAW);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
+  modelCreateBuffers();
 
-  // Generate EBO
-  abcg::glGenBuffers(1, &m_EBO);
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-  abcg::glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     sizeof(m_index.at(0)) * m_index.size(), m_index.data(),
-                     GL_STATIC_DRAW);
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // Create VAO and bind vertex attributes
-  abcg::glGenVertexArrays(1, &m_VAO);
-
-  abcg::glBindVertexArray(m_VAO);
-
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
   auto const positionAttribute{
-      abcg::glGetAttribLocation(program, "inPosition")};
-  abcg::glEnableVertexAttribArray(positionAttribute);
-  abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE,
-                              sizeof(Vertex), nullptr);
-  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
+      abcg::glGetAttribLocation(m_program, "inPosition")};
+  if (positionAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(positionAttribute);
+    abcg::glVertexAttribPointer(positionAttribute, 3, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex), nullptr);
+  }
 
-  abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+  auto const normalAttribute{abcg::glGetAttribLocation(m_program, "inNormal")};
+  if (normalAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(normalAttribute);
+    auto const offset{offsetof(Vertex, normal)};
+    abcg::glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex),
+                                reinterpret_cast<void *>(offset));
+  }
+
+  auto const texCoordAttribute{
+      abcg::glGetAttribLocation(m_program, "inTexCoord")};
+  if (texCoordAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(texCoordAttribute);
+    auto const offset{offsetof(Vertex, texCoord)};
+    abcg::glVertexAttribPointer(texCoordAttribute, 2, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex),
+                                reinterpret_cast<void *>(offset));
+  }
+
+  abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   abcg::glBindVertexArray(0);
 
   // Save location of uniform variables
-  m_viewMatrixLoc = abcg::glGetUniformLocation(program, "viewMatrix");
-  m_projMatrixLoc = abcg::glGetUniformLocation(program, "projMatrix");
-  m_modelMatrixLoc = abcg::glGetUniformLocation(program, "modelMatrix");
-  m_colorLoc = abcg::glGetUniformLocation(program, "color");
+  m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
+  m_normalMatrixLocation =
+      abcg::glGetUniformLocation(m_program, "normalMatrix");
 }
 
 void Skull::randomizeSkull() {
@@ -68,18 +80,23 @@ void Skull::randomizeSkull() {
   }
 
   s_rotation = 0.0f;
-  s_size = glm::vec3(0.0006f);
+  s_size = glm::vec3(0.5f);
 }
 
-void Skull::paint(Camera m_camera) {
+void Skull::paint(Camera m_camera, Moon m_moon) {
+  abcg::glUseProgram(m_program);
   abcg::glBindVertexArray(m_VAO);
 
-  // a variável uniforme color é definida como (0.33f, 0.21f, 0.18f, 1.0f)
-  // (marrom) no vertex shader
-  abcg::glUniformMatrix4fv(m_viewMatrixLoc, 1, GL_FALSE,
-                           &m_camera.getViewMatrix()[0][0]);
-  abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE,
-                           &m_camera.getProjMatrix()[0][0]);
+  materialBindTexture();
+
+  m_camera.loadLocation(m_program);
+  m_camera.bind();
+
+  m_moon.loadLocation(m_program);
+  m_moon.lightBind();
+
+  materialBindLocation();
+
 
   // Set model matrix as a translation matrix
   glm::mat4 model{1.0f};
@@ -87,8 +104,13 @@ void Skull::paint(Camera m_camera) {
   model = glm::rotate(model, s_rotation, glm::vec3(0, 1, 0));
   model = glm::scale(model, s_size);
 
-  abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  
+  auto const modelViewMatrix{glm::mat3(m_camera.getViewMatrix() * model)};
+  auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+  abcg::glUniformMatrix3fv(m_normalMatrixLocation, 1, GL_FALSE,
+                             &normalMatrix[0][0]);
+
   abcg::glDrawElements(GL_TRIANGLES, m_index.size(), GL_UNSIGNED_INT, nullptr);
 
   abcg::glBindVertexArray(0);
@@ -123,58 +145,4 @@ void Skull::update(float deltaTime, Camera camera) {
 /// @return posição da shuriken
 bool Skull::touch(glm::vec3 position_verify) {
   return glm::distance(position_verify, s_position) < 0.5f;
-}
-
-/// @brief Carrega o modelo da shuriken - Retirado das notas de aula
-/// @param path caminho do asset que contem o arquivo .obj da shuriken
-void Skull::loadModelFromFileSkull(std::string_view path) {
-  tinyobj::ObjReader reader;
-
-  if (!reader.ParseFromFile(path.data())) {
-    if (!reader.Error().empty()) {
-      throw abcg::RuntimeError(
-          fmt::format("Failed to load model {} ({})", path, reader.Error()));
-    }
-    throw abcg::RuntimeError(fmt::format("Failed to load model {}", path));
-  }
-
-  if (!reader.Warning().empty()) {
-    fmt::print("Warning: {}\n", reader.Warning());
-  }
-
-  auto const &attributes{reader.GetAttrib()};
-  auto const &shapes{reader.GetShapes()};
-
-  m_vertex.clear();
-  m_index.clear();
-
-  // A key:value map with key=Vertex and value=index
-  std::unordered_map<Vertex, GLuint> hash{};
-
-  // Loop over shapes
-  for (auto const &shape : shapes) {
-    // Loop over indices
-    for (auto const offset : iter::range(shape.mesh.indices.size())) {
-      // Access to vertex
-      auto const index{shape.mesh.indices.at(offset)};
-
-      // Vertex position
-      auto const startIndex{3 * index.vertex_index};
-      auto const vx{attributes.vertices.at(startIndex + 0)};
-      auto const vy{attributes.vertices.at(startIndex + 1)};
-      auto const vz{attributes.vertices.at(startIndex + 2)};
-
-      Vertex const vertex{.position = {vx, vy, vz}};
-
-      // If map doesn't contain this vertex
-      if (!hash.contains(vertex)) {
-        // Add this index (size of m_vertices)
-        hash[vertex] = m_vertex.size();
-        // Add this vertex
-        m_vertex.push_back(vertex);
-      }
-
-      m_index.push_back(hash[vertex]);
-    }
-  }
 }

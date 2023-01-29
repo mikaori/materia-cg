@@ -3,26 +3,21 @@
 
 #include "abcgOpenGL.hpp"
 #include "camera.hpp"
-#include "model.hpp"
+#include "material.hpp"
+#include "moon.hpp"
 
-class Skull {
+class Skull: public Material {
 public:
-  void create(GLuint program);
-  void paint(Camera m_camera);
+  void create();
+  void paint(Camera m_camera, Moon m_moon);
   void destroy();
   void update(float deltaTime, Camera camera);
   bool touch(glm::vec3 position_verify);
 
 private:
-  GLuint m_VAO{};
-  GLuint m_VBO{};
-  GLuint m_EBO{};
-
-  GLint m_viewMatrixLoc{};
-  GLint m_projMatrixLoc{};
-  GLint m_modelMatrixLoc{};
-  GLint m_colorLoc{};
-
+  GLint m_modelMatrixLocation{};
+  GLint m_normalMatrixLocation{};
+  
   void
   loadModelFromFileSkull(std::string_view path); // carregamento do arquivo OBJ
 
@@ -31,9 +26,6 @@ private:
   glm::vec3 s_position{};
   float s_rotation{};
   glm::vec3 s_size{};
-
-  std::vector<Vertex> m_vertex; // vertices lidos do arquivo OBJ
-  std::vector<GLuint> m_index;  // indices lidos do arquivo OBJ
 };
 
 #endif
