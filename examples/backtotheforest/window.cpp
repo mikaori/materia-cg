@@ -67,7 +67,7 @@ void Window::onPaint() {
   m_forest.paint(m_camera, m_moon);
 
   // definindo a orientação da superfície para indicar que o lado da frente tem vértices no sentido horário
-  abcg::glFrontFace(GL_CW);
+  abcg::glFrontFace(GL_CCW);
 
   // desabilita o programa de shader
   abcg::glUseProgram(0);

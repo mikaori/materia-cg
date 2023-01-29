@@ -8,9 +8,11 @@ public:
     float * getKa(){
         return &Ka.x;
     }
+
     float * getKd(){
         return &Kd.x;
     }
+
     float * getKs(){
         return &Ks.x;
     }
@@ -19,11 +21,19 @@ public:
         return shininess;
     }
 
+    int getMappingMode(){
+        return mappingMode;
+    }
+
 protected:
     glm::vec4 Ka{};
     glm::vec4 Kd{};
     glm::vec4 Ks{};
+    
     float shininess = 0.0f;
+
+    int mappingMode = 3;
+
 };
 
 #endif

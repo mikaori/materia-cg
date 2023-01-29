@@ -27,6 +27,8 @@ private:
   GLuint m_EBO{};
   GLuint m_program{};
 
+  GLuint m_diffuseTexture{};
+
   GLint m_viewMatrixLocation{};
   GLint m_projMatrixLocation{};
   GLint m_modelMatrixLocation{};
@@ -41,6 +43,8 @@ private:
   GLint m_KsLocation{};
   GLint m_shininessLocation{};
   GLint m_lightDiameterLocation{};
+  GLint m_diffuseTexLocation{};
+  GLint m_mappingModeLocation{};
   
   std::vector<Vertex> m_vertex; // vertices lidos do arquivo OBJ
   std::vector<GLuint> m_index; // indices lidos do arquivo OBJ
@@ -57,6 +61,7 @@ private:
   std::array<Tree, N_TREES> m_tree;
 
   void loadModelFromFileTree(std::string_view path, bool standardize = true); //carregamento do arquivo OBJ
+  void loadDiffuseTexture(std::string_view path);
 
   void randomizeTree(Tree &tree);
 
@@ -68,6 +73,8 @@ private:
   glm::vec4 m_Ks{1.0f};
 
   bool m_hasNormals{false};
+  bool m_hasTexCoords{false};
+
 
 };
 
