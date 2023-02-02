@@ -60,6 +60,7 @@ void Skull::create() {
 
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+  // fim do bind do VAO atual
   abcg::glBindVertexArray(0);
 
   // Save location of uniform variables
@@ -119,6 +120,7 @@ void Skull::paint(Camera m_camera, Moon m_moon) {
 
   abcg::glDrawElements(GL_TRIANGLES, m_index.size(), GL_UNSIGNED_INT, nullptr);
 
+  // fim do bind do VAO atual
   abcg::glBindVertexArray(0);
 }
 

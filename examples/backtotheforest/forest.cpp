@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unordered_map>
 
+// inicializa a floresta
 void Forest::create() {
 
   // propriedades do material
@@ -36,7 +37,7 @@ void Forest::create() {
   // cria os VBO, EBO e VAO
   modelCreateBuffers();
 
-  // Bind vertex attributes
+  // obtem os atributos de cada vértice (posição, vetor normal e coordenada das texturas)
   auto const positionAttribute{
       abcg::glGetAttribLocation(m_program, "inPosition")};
   if (positionAttribute >= 0) {
@@ -64,37 +65,51 @@ void Forest::create() {
                                 reinterpret_cast<void *>(offset));
   }
 
+  // fim do bind
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // End of binding to current VAO
+  // fim do bind para o atual VAO
   abcg::glBindVertexArray(0);
 
-
+  // obtem a localização de variáveis uniformes para o modelMatrix e o normalMatrix
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_normalMatrixLocation =
       abcg::glGetUniformLocation(m_program, "normalMatrix");
 
+  // carrega a localização de variáveis uniformes dos materiais
   materialLoadLocation(); 
 }
 
+// função de desenho das árvores
 void Forest::paint(Camera m_camera, Moon m_moon, Skull m_skull) {
+  
+  // começa a usar o programa de shader
   abcg::glUseProgram(m_program);
+  // começa a usar o VAO
   abcg::glBindVertexArray(m_VAO);
 
+  // realiza o bind das texturas
   materialBindTexture();
 
+  // carrega a localização de variáveis uniformes da câmera
   m_camera.loadLocation(m_program);
+  // realiza o bind das variáveis uniformes para viewMatrix e projMatrix da camera
   m_camera.bind();
 
+  // carrega a localização de variáveis uniformes da lua
   m_moon.loadLocation(m_program);
+  // realiza o bind das variáveis uniformes da lua
   m_moon.lightBind();
 
+  // carrega a localização de variáveis uniformes da Skuriken
   m_skull.loadLocation(m_program);
+  // realiza o bind das variáveis uniformes da Shuriken
   m_skull.lightBind();
 
+  // realiza o bind das variáveis uniformes do material
   materialBindLocation();
 
-  // Configuração de renderização de cada uma das árvores
+  // Configura a renderização de cada uma das árvores
   for (auto &tree : m_tree) {
     glm::mat4 model{1.0f};
     // concatenação de transformações que forma a matriz de modelo
@@ -117,16 +132,18 @@ void Forest::paint(Camera m_camera, Moon m_moon, Skull m_skull) {
   abcg::glBindVertexArray(0);
 }
 
+// função para randomizar a posição da árvore a cada 10 segundos
 void Forest::update(float deltaTime) {
-  // Randomize Tree position
   timeToChangeTree -= deltaTime;
 
   if (timeToChangeTree < 0.0f) {
     for (auto &tree : m_tree) {
+      // a cada 5 arvores, uma troca de lugar
       if (rand() % 5 == 0) {
         randomizeTree(tree);
       }
     }
+    // define o "tempo" para as árvores trocarem de lugar
     timeToChangeTree = 10.0f;
   }
 }
@@ -134,23 +151,21 @@ void Forest::update(float deltaTime) {
 // função que gera para posição e size aleatório para a árvore
 void Forest::randomizeTree(Tree &tree) {
 
-  // Random position: x and y in [-20, 20), z in [-100, 0)
+  // posição aleatória: x e y dentro do intervalo [-20, 20)
   std::uniform_real_distribution<float> distPosXZ(-20.0f, 20.0f);
 
   // define a posição da árvore usando a posição aleatória implementada acima
   tree.m_position =
       glm::vec3(distPosXZ(m_randomEngine), 0, distPosXZ(m_randomEngine));
 
-  // Random size: x and y in [-0.5, 2), z in [-100, 0)
+  // posição aleatória: x e y dentro do intervalo [0.50, 2.0)
   std::uniform_real_distribution<float> distSizeXZ(0.50f, 2.0f);
 
-  // define o tamanho aleatório de acordo com a variável aleátoria implementada
-  // acima
+  // define o tamanho aleatório de acordo com a variável aleátoria implementada acima
   tree.m_size = glm::vec3(distSizeXZ(m_randomEngine));
 }
 
-/// @brief liberar os recursos do OpenGL que foram alocados em onCreate ou
-/// durante a aplicação
+// libera os recursos do OpenGL que foram alocados para a floresta
 void Forest::destroy() {
   abcg::glDeleteTextures(1, &m_diffuseTexture);
   abcg::glDeleteBuffers(1, &m_EBO);

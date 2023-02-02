@@ -66,7 +66,7 @@ void Camera::loadLocation(GLint m_program){
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
 }
 
-// define variáveis uniformes para viewMatrix e projMatrix
+// define variáveis uniformes para viewMatrix e projMatrix da camera
 void Camera::bind(){
   abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
                            &getViewMatrix()[0][0]);
