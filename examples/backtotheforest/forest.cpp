@@ -9,26 +9,31 @@
 
 void Forest::create() {
 
-  // Material properties
+  // propriedades do material
   Ka = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
   Kd = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
   Ks = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
   shininess = 1.0f;
 
+  // contem o caminho atual do subdiretório
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
+  // armazena os recursos alocados (shaders, arranjo de vértices)
   m_program =
       abcg::createOpenGLProgram({{.source = assetsPath + "shaders/forest.vert",
                                   .stage = abcg::ShaderStage::Vertex},
                                  {.source = assetsPath + "shaders/forest.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
   
+  // gera para cada uma das árvores uma posição e um size aleatório
   for (auto &tree : m_tree) {
     randomizeTree(tree);
   }
 
+  // carrega o arquivo OBJ da tree
   materialLoadModelFromFile(assetsPath + "/obj/tree/Tree.obj", false);
 
+  // cria os VBO, EBO e VAO
   modelCreateBuffers();
 
   // Bind vertex attributes

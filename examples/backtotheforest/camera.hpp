@@ -7,7 +7,11 @@
 
 class Camera {
 public:
+
+  // função que computa a matriz de visão
   void computeViewMatrix();
+
+  // função que computa uma matriz de projeção perspectiva 
   void computeProjectionMatrix(glm::vec2 const &size);
 
   // funções que modificam as variáveis m_eye e m_at
@@ -19,10 +23,13 @@ public:
   glm::mat4 const &getViewMatrix() const { return m_viewMatrix; }
   glm::mat4 const &getProjMatrix() const { return m_projMatrix; }
 
-  // pega a posição da câmera
+  // função que retorna a posição da câmera
   glm::vec3 getCameraPosition();
 
+  // função que carrega as matrizes de localização de variáveis uniformes para viewMatriz e projMatrix
   void loadLocation(GLint);
+
+  // função que define variáveis uniformes para viewMatriz e projMatrix
   void bind();
 
 private:
@@ -30,11 +37,11 @@ private:
   glm::vec3 m_at{0.0f, 0.5f, 0.0f};  // Look-at point
   glm::vec3 m_up{0.0f, 1.0f, 0.0f};  // "up" direction
 
-  // Matrix to change from world space to camera space
+  // matriz para mudar o espaço do mundo para o espaço da câmera
   GLint m_viewMatrixLocation{};
   glm::mat4 m_viewMatrix;
 
-  // Matrix to change from camera space to clip space
+  // matriz para mudar o espaço da câmera para o espaço do clip
   GLint m_projMatrixLocation{};
   glm::mat4 m_projMatrix;
 };

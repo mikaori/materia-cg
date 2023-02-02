@@ -187,3 +187,87 @@ Implementa as funções declaradas na classe Window. Assim, aqui é tratado:
   2. **GameOver**: "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...".
 
 - Realiza-se também o update da rotação e da posição da shuriken conforme a posição da câmera, o que dá ao player a sensação de estar sendo perseguido pela shuriken. Verifica-se também se a shuriken alcançou o jogador, caso tenha alcançado, o status do jogo é alterado para GameOver. Esta alteração dá sequência a um cronometro de 10s que quando acaba o seu tempo o jogo é encerrado.  
+
+## Atividade 04 - Back To The Forest
+
+[LINK PARA A APLICAÇÃO](https://mikaori.github.io/cg_ufabc/backtotheforest/) 
+
+A aplicação consiste em uma segunda versão do simulador de fuga contra a *shuriken* conhecida como **Skull**. 
+
+Nesta versão, a skull continua perseguindo qualquer um que entra na floresta a noite! Mas agora ela tem um novo poder que tem o objetivo de assustar o player ainda mais :japanese_ogre:
+
+Seu novo poder consiste em iluminar a visão na direção que ela está perseguindo. Essa iluminação é assustadoramente vermelha.
+
+Aqui o player continua com **um único objetivo**: TENTAR FUGIR! 
+
+Mas, o mini game continua sem rotas de fuga para o player vencer. A *skuriken* ainda é tão rápida que o player não consegue fugir! :cold_sweat:
+
+A floresta continua nada amigável com o player, ela ainda troca aleatoriamente de lugar a cada 10 segundos para deixar o jogador ainda mais confuso. 
+
+Dessa forma, o **destino para o player** continua o mesmo: a shuriken avança de algum canto do cenário perseguindo-o, quando ela o alcança, o player é atingido e o jogo **encerra sozinho** representando a morte dele.
+
+O game é em primeira pessoa e a câmera representa a visão do player. 
+
+A interação do usuário continua o mesmo, o player se move por meio das teclas A, W, S, D ou  ←, →, ↑ e ↓. As teclas A e D são responsáveis pela movimentação lateral da posição da câmera (movimento conhecido como pan). As teclas W e S realizam a movimentação da posição da câmera para frente e para trás (movimento conhecido também como dolly) .
+
+### **Implementações realizadas:**
+
+### *Interface*
+- Mensagem para o jogador indicando o que ele deve fazer. 
+
+- Cenário: o background do cenário está mais complexo e cheio de detalhes. Existem shaders de iluminação e textura para as árvores e a skull. Há também uma iluminação global como se houvesse uma lua iluminando levemente a floresta.
+
+- Câmera: representa a visão do player no jogo.
+
+- Personagem: Shuriken 3D que persegue o player. A skull possui uma iluminação própria que interage com o cenário iluminando com sua luz vermelha as árvores que estão perto da direção que ela está perseguindo o player.
+
+### *Implementação do código*
+
+**camera.hpp**
+A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Assim, neste arquivo definimos todos os atributos necessários para criar o quadro da câmera. 
+
+**camera.cpp**
+A implementação da câmera utilizou o código do projeto lookat visto nas notas de aula. Neste arquivo definimos as funções da câmera, ou seja, aqui implementamos o movimento dolly, truck e pan da camera. Essas funções realizam modificações nas variáveis m_eye e m_at tal que a camera passa a alterar a posição e a sua orientação.
+
+**gamedata.hpp**
+O controle do estado da vida do player foi implementada com base em máquina de estados. Neste arquivo está contido a classe State utilizada para controlar os estados do jogo através da struct GameData. Existem apenas dois estados nesta aplicação: 
+1. **Playing**: O estado representa que o jogador está tentando fugir. Esse é o estado inicial.
+2. **GameOver**: Preparação para finalização do jogo.
+
+**ground.hpp**
+Contém a definição da classe Ground que é responsável pelo desenho do chão. O código utilizado foi visto nas notas de aula. 
+
+**ground.cpp**
+Contém a implementação das funções da classe Ground. O código utilizado foi visto nas notas de aula. Todavia, foi feito uma alteração para ser desenhado um quadriláterio de 20x20 unidades com apenas uma cor (no caso, verde). A cor do chão representa a grama da floresta.
+
+**main.cpp**
+Definição os pontos de entrada da aplicação. O código usado é o mesmo das notas de aula. Nenhuma modificação foi realizada além do título da janela.
+
+**skull.hpp**
+Aqui é definido a classe Shuriken, responsável pelo desenho da shuriken Skull na aplicação.
+
+**skull.cpp**
+Possui a implementação das definições da classe Shuriken, o qual esta classe apresenta quatro responsabilidades. A primeira é a renderização da shuriken. Já a segunda é definir a posição da skuriken no inicio do jogo, esta posição ocorre de maneira aleatória, podendo surgir nos seguintes pontos: {-15.0f, 0.20f, -15.0f}, {15.0f, 0.20f, 15.0f}, {-15.0f, 0.20f, 15.0f} e {15.0f, 0.20f, -15.0f}. O objetivo desses pontos é o jogador não conseguir identificar de onde ela irá surgir. 
+
+A terceira é o movimento da shuriken que simula o efeito de perseguição em direção ao player. Para realizar este efeito é somado a posição da Skull o resultado da normalização da diferença entre os vetores de posição da shuriken e da câmera. 
+
+Por fim, a quarta responsabilidade verifica se a shuriken encostou em algo. Isso será utilizado para verificar se a Skull tocou a câmera. A forma de implementação é medindo se a distancia entre a Skull e o objeto é menor que 0.5f, caso positivo, a Skull encostou.
+
+**vertex.hpp**
+Os códigos neste arquivo utilizam os códigos vistos em aula.
+Há necessidade de criar este arquivo foi devido a utilização se suas estruturas em mais de uma classe. Dessa forma, foi implementado a struct que define os atributos que compõe um vértice. Cada um dos vértices possuem apenas uma posição definida (x,y,z) e um operador que verifica se dois vértices são iguais. Além disso, tem-se também a especialização explícita de std::hash para a estrutura de Vertex definida.
+
+**window.hpp**
+Implementação das definições da classe Window. Ela é responsável tanto pelo gerenciamento da janela da aplicação quanto pela lógica do jogo.  
+
+**window.cpp**
+Implementa as funções declaradas na classe Window. Assim, aqui é tratado:
+- Os eventos de teclado de forma que quando alguma das teclas (AWSD ou as setas) é pressionada ou liberada, a velocidade de dolly, pan ou truck é alterada para -1, 1 ou 0. 
+
+- É realizado também a rederização do total de 1500 árvore. Cada vez que o jogo inicia, a posição de cada árvore no jogo é gerada de forma aleatória. Além disso, ocorre também a alteração da posição de 1/5 das árvores de forma aleatória.
+
+- Implementação de mensagens no jogo conforme o estado da player. Para isso utilizou-se um widget da ImGui para exibir a mensagem na interface. Os estados apresentam as seguintes mensagens:
+  1. **Playing**: "JUST RUN!!!".
+  2. **GameOver**: "OH NO, YOU ARE CAPTURE!!! he reached you!! CLOSING IN 10s...".
+
+- Realiza-se também o update da rotação e da posição da shuriken conforme a posição da câmera, o que dá ao player a sensação de estar sendo perseguido pela shuriken. Verifica-se também se a shuriken alcançou o jogador, caso tenha alcançado, o status do jogo é alterado para GameOver. Esta alteração dá sequência a um cronometro de 10s que quando acaba o seu tempo o jogo é encerrado.  

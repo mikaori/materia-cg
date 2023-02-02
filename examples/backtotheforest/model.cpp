@@ -132,15 +132,20 @@ void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
   modelComputeNormals();
 }
 
+// realiza a criação do VBO, EBO e VAO
 void Model::modelCreateBuffers() {
-  // Generate VBO
+
+  // gera um novo VBO
   abcg::glGenBuffers(1, &m_VBO);
+  // realiza o bind para usar ele
   abcg::glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+  // faz o upload dos dados para o VBO
   abcg::glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertex.at(0)) * m_vertex.size(),
                      m_vertex.data(), GL_STATIC_DRAW);
+  // permite a desvinculação do VBO
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // Generate EBO
+  // gera o EBO (buffer de índices do VBO)
   abcg::glGenBuffers(1, &m_EBO);
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
   abcg::glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -148,13 +153,13 @@ void Model::modelCreateBuffers() {
                      GL_STATIC_DRAW);
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // Release previous VAO
+  // libera o VAO anterior
   abcg::glDeleteVertexArrays(1, &m_VAO);
 
-  // Create VAO
+  // gera VAO
   abcg::glGenVertexArrays(1, &m_VAO);
 
-  // Bind vertex attributes to current VAO
+  // vincula atributos de vértice ao VAO atual
   abcg::glBindVertexArray(m_VAO);
 
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
