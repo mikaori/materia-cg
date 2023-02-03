@@ -1,5 +1,6 @@
 #include "moon.hpp"
 
+// inicializa as váriaveis de iluminação da lua
 void Moon::create() {
   Ia = glm::vec4{0.3f};
   Is = glm::vec4{0.3f};
@@ -8,6 +9,7 @@ void Moon::create() {
   lightDiameter = 1000.0f;
 }
 
+// obtem a localização das variáveis uniformes relacionadas a iluminação da lua
 void Moon::loadLocation(GLint m_program){
   m_IaLocation = abcg::glGetUniformLocation(m_program, "IaMoon");
   m_IdLocation = abcg::glGetUniformLocation(m_program, "IdMoon");

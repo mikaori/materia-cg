@@ -1,6 +1,6 @@
 #include "light.hpp"
 
-
+// Define os valores das variáveis uniformes relacionadas à luz no shader
 void Light::lightBind(){
   abcg::glUniform4fv(m_lightDirLocation, 1, getLightDirection());
   abcg::glUniform4fv(m_IaLocation, 1, getIa());

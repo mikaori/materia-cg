@@ -6,8 +6,9 @@
 #include <iostream>
 #include <unordered_map>
 
+// inicializa a skull
 void Skull::create() {
-  // Light properties
+  // seta as propriedades de iluminação da skull
   Ia = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
   Id = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
   Is = glm::vec4{0.3f, 0.05f, 0.05f, 1.0f};
@@ -15,22 +16,29 @@ void Skull::create() {
 
   shininess = 1.0f;
 
+  // define o modo de mapping da textura
   mappingMode = 2;
 
+  // carrega o caminho atual do subdiretório
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
+  // armazena os recursos alocados (shaders, arranjo de vértices)
   m_program =
       abcg::createOpenGLProgram({{.source = assetsPath + "shaders/skull.vert",
                                   .stage = abcg::ShaderStage::Vertex},
                                  {.source = assetsPath + "shaders/skull.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
+  // randomiza a posição inicial da skull
   randomizeSkull();
   
+  // carrega o OBJ da skull
   materialLoadModelFromFile(assetsPath + "/obj/skull/Skull.obj", true);
 
+  // cria os VBO, EBO e VAO
   modelCreateBuffers();
 
+  // obtem os atributos de cada vértice (posição, vetor normal e coordenada das texturas)
   auto const positionAttribute{
       abcg::glGetAttribLocation(m_program, "inPosition")};
   if (positionAttribute >= 0) {
@@ -58,20 +66,23 @@ void Skull::create() {
                                 reinterpret_cast<void *>(offset));
   }
 
+  // fim do bind
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // fim do bind do VAO atual
   abcg::glBindVertexArray(0);
 
-  // Save location of uniform variables
+  // obtem a localização de variáveis uniformes para o modelMatrix e o normalMatrix
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_normalMatrixLocation =
       abcg::glGetUniformLocation(m_program, "normalMatrix");
+  
+  // carrega a localização de variáveis uniformes dos materiais
   materialLoadLocation();
 }
 
+// randomiza a posição inicial da skull
 void Skull::randomizeSkull() {
-  // Random position: x and y in [-20, 20), z in [-100, 0)
   int selected_position = rand() % 4;
 
   if (selected_position == 0) {
@@ -88,29 +99,42 @@ void Skull::randomizeSkull() {
   s_size = glm::vec3(0.5f);
 }
 
+// função de desenho da shuriken
 void Skull::paint(Camera m_camera, Moon m_moon) {
+
+  // começa a usar o programa de shader
   abcg::glUseProgram(m_program);
+  // começa a usar o VAO
   abcg::glBindVertexArray(m_VAO);
 
+  // realiza o bind das texturas
   materialBindTexture();
 
+  // carrega a localização de variáveis uniformes da câmera
   m_camera.loadLocation(m_program);
+  // realiza o bind das variáveis uniformes para viewMatrix e projMatrix da camera
   m_camera.bind();
 
+  // carrega a localização de variáveis uniformes da lua
   m_moon.loadLocation(m_program);
+  // realiza o bind das variáveis uniformes da lua
   m_moon.lightBind();
 
+  // carrega a localização de variáveis uniformes da skull
   loadLocation(m_program);
+  // realiza o bind das variáveis uniformes da skull
   lightBind();
 
+  // realiza o bind das variáveis uniformes do material
   materialBindLocation();
 
-  // Set model matrix as a translation matrix
+  // define a matriz modelo como a matriz de translação
   glm::mat4 model{1.0f};
   model = glm::translate(model, s_position);
   model = glm::rotate(model, s_rotation, glm::vec3(0, 1, 0));
   model = glm::scale(model, s_size);
 
+  // envia a matriz modelo para a variável m_modelMatrix no vertex shader
   abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
 
   auto const modelViewMatrix{glm::mat3(m_camera.getViewMatrix() * model)};
@@ -118,23 +142,20 @@ void Skull::paint(Camera m_camera, Moon m_moon) {
   abcg::glUniformMatrix3fv(m_normalMatrixLocation, 1, GL_FALSE,
                            &normalMatrix[0][0]);
 
+  // comando de renderização
   abcg::glDrawElements(GL_TRIANGLES, m_index.size(), GL_UNSIGNED_INT, nullptr);
 
-  // fim do bind do VAO atual
   abcg::glBindVertexArray(0);
 }
 
-/// @brief liberar os recursos do OpenGL que foram alocados em onCreate ou
-/// durante a aplicação
+// liberar os recursos do OpenGL que foram alocados em onCreate ou durante a aplicação
 void Skull::destroy() {
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
 
-/// @brief realiza o update da posição e rotação da shuriken
-/// @param deltaTime tempo entre os quadros de exibição
-/// @param camera recebe a classe responsável pela Câmera
+// realiza o update da posição, rotação e iluminação da shuriken
 void Skull::update(float deltaTime, Camera camera) {
 
   glm::vec3 diffVectorPosition =
@@ -150,13 +171,12 @@ void Skull::update(float deltaTime, Camera camera) {
   s_rotation += 20.0f * deltaTime; // velocidade de rotação
 }
 
-/// @brief verifica se a shuriken alcançou o player
-/// @param position_verify posição da câmera
-/// @return posição da shuriken
+// verifica se a shuriken alcançou o player
 bool Skull::touch(glm::vec3 position_verify) {
   return glm::distance(position_verify, s_position) < 0.5f;
 }
 
+// obtem a localização das variáveis uniformes relacionadas a iluminação da skull
 void Skull::loadLocation(GLint m_program) {
   m_IaLocation = abcg::glGetUniformLocation(m_program, "IaSkull");
   m_IdLocation = abcg::glGetUniformLocation(m_program, "IdSkull");

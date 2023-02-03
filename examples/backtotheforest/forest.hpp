@@ -22,7 +22,7 @@ public:
   // função de desenho das árvores
   void paint(Camera m_camera, Moon m_moon, Skull m_skull);
 
-  // liberar os recursos do OpenGL que foram alocados em onCreate ou durante a aplicação
+  // liberar os recursos do OpenGL que foram alocados
   void destroy();
   
   // função para randomizar a posição da árvore a cada 10 segundos

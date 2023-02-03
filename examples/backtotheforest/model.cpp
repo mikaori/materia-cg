@@ -7,8 +7,8 @@
 #include <iostream>
 #include <unordered_map>
 
+// centraliza o modelo na origem e normaliza o tamanho
 void Model::modelStandardize() {
-  // Center to origin and normalize largest bound to [-1, 1]
 
   // Get bounds
   glm::vec3 max(std::numeric_limits<float>::lowest());
@@ -26,36 +26,38 @@ void Model::modelStandardize() {
   }
 }
 
+// calcula os vetores normais do modelo
 void Model::modelComputeNormals() {
 
+  // verifica se o modelo vem com os vetores de normal calculado
   if (!m_hasNormals) {
     return;
   }
 
-  // Clear previous vertex normals
+  // Limpa vetores normais anteriores
   for (auto &vertex : m_vertex) {
-    vertex.normal = glm::vec3(0.0f);
+    vertex.normal = glm::vec3(0.0f); // define vetores como (0.0,0.0,0.0)
   }
 
-  // Compute face normals
+  // Calcula o normal da face
   for (auto const offset : iter::range(0UL, m_index.size(), 3UL)) {
-    // Get face vertices
+    // obtem os vértices da face
     auto &a{m_vertex.at(m_index.at(offset + 0))};
     auto &b{m_vertex.at(m_index.at(offset + 1))};
     auto &c{m_vertex.at(m_index.at(offset + 2))};
 
-    // Compute normal
+    // Calcula a normal
     auto const edge1{b.position - a.position};
     auto const edge2{c.position - b.position};
     auto const normal{glm::cross(edge1, edge2)};
 
-    // Accumulate on vertices
+    // Acumula nos vértices
     a.normal += normal;
     b.normal += normal;
     c.normal += normal;
   }
 
-  // Normalize
+  // normaliza o atributo normal 
   for (auto &vertex : m_vertex) {
     vertex.normal = glm::normalize(vertex.normal);
   }
@@ -63,6 +65,7 @@ void Model::modelComputeNormals() {
   m_hasNormals = true;
 }
 
+// calcula o modelo por meio do arquivo .obj
 void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
                                    bool standardize) {
 
@@ -78,20 +81,20 @@ void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
   // A key:value map with key=Vertex and value=index
   std::unordered_map<Vertex, GLuint> hash{};
 
-  // Loop over shapes
+  // percorre as formas
   for (auto const &shape : shapes) {
-    // Loop over indices
+    // percorre os indices
     for (auto const offset : iter::range(shape.mesh.indices.size())) {
-      // Access to vertex
+      // acessa os vértices
       auto const index{shape.mesh.indices.at(offset)};
 
-      // Vertex position
+      // posição dos vértices
       auto const startIndex{3 * index.vertex_index};
       glm::vec3 position{attrib.vertices.at(startIndex + 0),
                          attrib.vertices.at(startIndex + 1),
                          attrib.vertices.at(startIndex + 2)};
 
-      // Vertex normal
+      // vértice normal
       glm::vec3 normal{};
       if (index.normal_index >= 0) {
         m_hasNormals = true;
@@ -101,7 +104,7 @@ void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
                   attrib.normals.at(normalStartIndex + 2)};
       }
 
-      // Texture coordinates
+      // coordenada da textura
       glm::vec2 texCoord{};
       if (index.texcoord_index >= 0) {
         m_hasTexCoords = true;
@@ -113,11 +116,11 @@ void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
       Vertex const vertex{
           .position = position, .normal = normal, .texCoord = texCoord};
 
-      // If map doesn't contain this vertex
+      // se o map não possui esse vértice
       if (!hash.contains(vertex)) {
-        // Add this index (size of m_vertices)
+        // adiciona esse index (tamanho do m_vertices)
         hash[vertex] = m_vertex.size();
-        // Add this vertex
+        // adiciona esse vértice
         m_vertex.push_back(vertex);
       }
 
@@ -125,14 +128,16 @@ void Model::modelLoadModelFromFile(tinyobj::ObjReader reader,
     }
   }
 
+  // verifica se é necessário centralizar na origem e normalizar o tamanho do modelo
   if (standardize) {
     modelStandardize();
   }
 
+  // calcula os vetores normais do modelo
   modelComputeNormals();
 }
 
-// realiza a criação do VBO, EBO e VAO
+// realiza a criação e configuração do VBO, EBO e VAO
 void Model::modelCreateBuffers() {
 
   // gera um novo VBO

@@ -2,44 +2,50 @@
 
 #include <unordered_map>
 
+// comandos de inicialização do estado da janela e do OpenGL
 void Window::onCreate() {
 
   // definindo o estado do game data para Playing
   m_gameData.m_state = State::Playing;
 
+  // contem o caminho atual do subdiretório
   auto const &assetsPath{abcg::Application::getAssetsPath()};
 
+  // define a cor preta no fundo
   abcg::glClearColor(0, 0, 0, 1);
 
   // habilita depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
 
-  // criação do program
+  // armazena os recursos alocados (shaders, arranjo de vértices)
   m_program =
       abcg::createOpenGLProgram({{.source = assetsPath + "shaders/default.vert",
                                   .stage = abcg::ShaderStage::Vertex},
                                  {.source = assetsPath + "shaders/default.frag",
                                   .stage = abcg::ShaderStage::Fragment}});
 
-  // inicializa o VAO/VBO do chão
+  // inicializa o chão
   m_ground.create(m_program);
 
-  // inicializa o VAO/VBO da shuriken
+  // inicializa a shuriken
   m_skull.create();
 
-  // inicializa o VAO/VBO da floresta
+  // inicializa a floresta
   m_forest.create();
 
+  // inicializa a lua
   m_moon.create();
 
-  // pega a localização das variáveis uniformes
+  // obtem a localização das variáveis uniformes do viewMatrix, projMatrix e do color
   m_viewMatrixLocation = abcg::glGetUniformLocation(m_program, "viewMatrix");
   m_projMatrixLocation = abcg::glGetUniformLocation(m_program, "projMatrix");
   m_modelMatrixLocation = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_colorLocation = abcg::glGetUniformLocation(m_program, "color");
 }
 
+// função de desenhos
 void Window::onPaint() {
+
   // Clear color buffer and depth buffer
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -65,20 +71,20 @@ void Window::onPaint() {
   // Desenha as árvores
   m_forest.paint(m_camera, m_moon, m_skull);
 
-  // definindo a orientação da superfície para indicar que o lado da frente tem
-  // vértices no sentido horário
+  // definindo a orientação da superfície para indicar que o lado da frente tem vértices no sentido horário
   abcg::glFrontFace(GL_CCW);
 
   // desabilita o programa de shader
   abcg::glUseProgram(0);
 }
 
+// funções de desenho de widgets da ImGui
 void Window::onPaintUI() {
   // pega a largura atual da janela da aplicação através da função
   auto const appWindowWidth{gsl::narrow<float>(getWindowSettings().width)};
 
   {
-    // janela terá o tamanho 60
+    // janela terá o tamanho 100
     ImGui::SetNextWindowSize(ImVec2(appWindowWidth, 100));
 
     // janela deverá estar na coordenada (0,0) da janela da aplicação
@@ -87,6 +93,7 @@ void Window::onPaintUI() {
     // implementação da janela de mensagem
     ImGui::Begin("MESSAGE", nullptr);
 
+    // altera a mensagem de acordo com o state do jogo
     if (m_gameData.m_state == State::Playing) {
       ImGui::TextColored(ImVec4(1, 1, 0, 1), "JUST RUN!!!");
     } else {
@@ -100,14 +107,17 @@ void Window::onPaintUI() {
   }
 }
 
+// faz o resize da janela sempre que o tamanho da janela é alterado
 void Window::onResize(glm::ivec2 const &size) {
   m_viewportSize = size;
   m_camera.computeProjectionMatrix(size);
 }
 
+// libera os recursos do OpenGL que foram alocados 
 void Window::onDestroy() {
   m_ground.destroy();
   m_skull.destroy();
+  m_forest.destroy();
 
   abcg::glDeleteProgram(m_program);
   abcg::glDeleteBuffers(1, &m_EBO);
@@ -115,26 +125,27 @@ void Window::onDestroy() {
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
 
+// faz o update dos objetos
 void Window::onUpdate() {
   auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
 
-  // Update LookAt camera
+  // faz o update da camera
   m_camera.dolly(m_dollySpeed * deltaTime);
   m_camera.truck(m_truckSpeed * deltaTime);
   m_camera.pan(m_panSpeed * deltaTime);
 
-  // Update shuriken position and rotation
+  // faz o update da posição e rotação da shuriken
   m_skull.update(deltaTime, m_camera);
 
-  // Update tree position and rotation
+  // faz o update da posição da floresta
   m_forest.update(deltaTime);
 
-  // Verify if the shuriken have "touch" the camera
+  // verifica se a shuriken "tocou" na camera
   if (m_skull.touch(m_camera.getCameraPosition())) {
     m_gameData.m_state = State::GameOver;
   }
 
-  // Exit the execution if the state is GameOver
+  // finaliza a execução se o status é GameOver
   if (m_gameData.m_state == State::GameOver) {
     timeToEndGame -= deltaTime;
     if (timeToEndGame < 0.0f) {
@@ -143,6 +154,7 @@ void Window::onUpdate() {
   }
 }
 
+// captura os eventos de input do player
 void Window::onEvent(SDL_Event const &event) {
 
   if (event.type == SDL_KEYDOWN) {
