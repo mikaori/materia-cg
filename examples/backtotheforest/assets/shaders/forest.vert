@@ -27,6 +27,7 @@ out vec2 fragTexCoord;
 out vec3 fragPObj;
 out vec3 fragNObj;
 
+// valores do gradiente e da densidade definidos para a transição da escuridão
 const float gradient = 2.0;
 const float density = 0.25;
 
@@ -39,11 +40,11 @@ void main() {
   vec3 LMoon = -(viewMatrix * lightDirWorldSpaceMoon).xyz;
   vec3 LSkull = -(viewMatrix * lightDirWorldSpaceSkull).xyz;
 
+  // estabelece uma escuridão com uma transição mais "suave" dentro da floresta 
   float dis = length(posEyeSpace.xyz);
   vis = exp(-pow(dis*density, gradient));
   vis = clamp(vis, 0.0, 1.0);
 
-  // altera o atributo de acordo com a intensidade definida em i
   fragLMoon = LMoon;
   fragLSkull = LSkull;
   fragV = -P;

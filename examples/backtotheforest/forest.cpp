@@ -148,7 +148,7 @@ void Forest::update(float deltaTime) {
   }
 }
 
-// função que gera para posição e size aleatório para a árvore
+// função que gera uma posição e size aleatório para a árvore
 void Forest::randomizeTree(Tree &tree) {
 
   // posição aleatória: x e y dentro do intervalo [-20, 20)

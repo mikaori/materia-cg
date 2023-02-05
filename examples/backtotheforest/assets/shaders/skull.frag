@@ -20,7 +20,6 @@ uniform vec4 IaSkull, IdSkull, IsSkull;
 uniform vec4 lightDirWorldSpaceSkull;
 uniform float lightDiameterSkull;
 
-
 // Material properties
 uniform vec4 Ka, Kd, Ks;
 uniform float shininess;
@@ -119,12 +118,16 @@ vec2 TextCoordinate(){
 }
 
 void main() {
-
+  // implementa o modo de mapping definido
   vec2 textCord = TextCoordinate();
+
+  // calcula a iluminação da skull de acordo com a iluminação proveniente da lua
   vec4 colorMoon = Phong(fragN, fragLMoon, fragV, textCord, IaMoon, IdMoon, IsMoon) * IntensityLight(fragLMoon, lightDirWorldSpaceMoon, lightDiameterMoon);
+
+  // calcula a iluminação skull de acordo com a iluminação proveniente da skull
   vec4 colorSkull = Phong(fragN, fragLSkull, fragV, textCord, IaSkull, IdSkull, IsSkull) * IntensityLight2(fragLSkull, lightDirWorldSpaceSkull, lightDiameterSkull);
 
-  vec4 color = colorSkull + colorSkull;
+  vec4 color = colorSkull + colorMoon;
 
   // define a cor final do fragmento
   

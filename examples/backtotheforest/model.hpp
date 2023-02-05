@@ -23,7 +23,7 @@ template <> struct std::hash<Vertex> {
   }
 };
 
-// classe responsável por gerenciar os vértices, VBO, EBO e VAO
+// classe responsável pelo carregamento do arquivo OBJ e gerenciamento dos vértices, VBO, EBO e VAO
 class Model {
 public:
   // função que calcula os vetores normais do modelo

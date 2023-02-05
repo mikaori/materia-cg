@@ -46,15 +46,14 @@ void Window::onCreate() {
 // função de desenhos
 void Window::onPaint() {
 
-  // Clear color buffer and depth buffer
+  // limpa o buffer de color e depth buffer
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
 
   abcg::glUseProgram(m_program);
 
-  // Set uniform variables for viewMatrix and projMatrix
-  // These matrices are used for every scene object
+  // Define variáveis uniformes para viewMatrix e projMatrix essas matrizes são usadas para cada objeto de cena
   abcg::glUniformMatrix4fv(m_viewMatrixLocation, 1, GL_FALSE,
                            &m_camera.getViewMatrix()[0][0]);
   abcg::glUniformMatrix4fv(m_projMatrixLocation, 1, GL_FALSE,

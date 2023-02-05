@@ -39,18 +39,18 @@ void main() {
   vec3 LMoon = -(viewMatrix * lightDirWorldSpaceMoon).xyz;
   vec3 LSkull = -(viewMatrix * lightDirWorldSpaceSkull).xyz;
 
+  // estabelece uma escuridão com uma transição mais "suave" dentro da floresta 
   float dis = length(posEyeSpace.xyz);
   vis = exp(-pow(dis*density, gradient));
   vis = clamp(vis, 0.0, 1.0);
 
-  // altera o atributo de acordo com a intensidade definida em i
   fragLMoon = LMoon;
   fragLSkull = LSkull;
   fragV = -P;
   fragN = N;
   fragTexCoord = inTexCoord;
-  fragPObj = inPosition;
-  fragNObj = inNormal;
+  fragPObj = inPosition; //posição do vértice no espaço do objeto
+  fragNObj = inNormal; //vetor normal no espaço do objeto
 
   // converte o espaço da câmera para o espaço de recorte
   gl_Position = projMatrix * posEyeSpace;

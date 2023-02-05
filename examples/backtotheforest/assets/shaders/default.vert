@@ -20,11 +20,9 @@ const float density = 0.25;
 
 void main() {
   // posição do vértice no espaço da câmera
-  //vec4 posEyeSpace = viewMatrix * modelMatrix * vec4(inPosition, 1);
   vec4 posEyeSpace = viewMatrix * modelMatrix * vec4(inPosition, 1);
-  // intensidade da cor a distancia de 20 unidades da coordenada z do vértice no espaço da câmera
-  //vis = 1.0 - (-posEyeSpace.z / 20.0);
   
+  // estabelece uma escuridão com uma transição mais "suave" dentro da floresta 
   float dis = length(posEyeSpace.xyz);
   vis = exp(-pow(dis*density, gradient));
   vis = clamp(vis, 0.0, 1.0);

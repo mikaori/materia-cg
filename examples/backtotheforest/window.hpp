@@ -26,7 +26,7 @@ protected:
   // funções de desenho de widgets da ImGui
   void onPaintUI() override;
 
-  // faz o resize da janela sempre que o tamanho da janela é alterado
+  // faz o resize dos elementos e objetos sempre que o tamanho da janela é alterado
   void onResize(glm::ivec2 const &size) override;
 
   // libera os recursos que foram alocados 

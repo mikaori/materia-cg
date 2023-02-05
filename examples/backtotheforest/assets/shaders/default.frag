@@ -8,7 +8,6 @@ in float vis;
 out vec4 outColor;
 
 void main() {
-
   // define a cor final do fragmento
   if (gl_FrontFacing) {
     outColor = vec4(vis, vis, vis, 1) * fragColor;

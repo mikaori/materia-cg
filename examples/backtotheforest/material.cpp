@@ -67,25 +67,23 @@ void Material::materialBindTexture() {
   abcg::glActiveTexture(GL_TEXTURE0);
   abcg::glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
 
-  // configurar os filtros de textura
+  // configura os filtros de textura
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  // define os parametros de empacotamento da textura texture wrapping parameters
+  // define os parametros de empacotamento da textura
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 
-// realiza o carregamento do material através do arquivo .obj
-void Material::materialLoadModelFromFile(std::string_view path,
-                                         bool standardize) {
+// realiza a preparação do carregamento do arquivo .obj
+void Material::materialLoadModelFromFile(std::string_view path, bool standardize) {
 
   tinyobj::ObjReader reader;
   tinyobj::ObjReaderConfig readerConfig;
 
   auto const basePath{std::filesystem::path{path}.parent_path().string() + "/"};
-  readerConfig.mtl_search_path = basePath; // path para o arquivo do material
 
   if (!reader.Warning().empty()) {
     fmt::print("Warning: {}\n", reader.Warning());

@@ -20,7 +20,6 @@ uniform vec4 IaSkull, IdSkull, IsSkull;
 uniform vec4 lightDirWorldSpaceSkull;
 uniform float lightDiameterSkull;
 
-
 // Material properties
 uniform vec4 Ka, Kd, Ks;
 uniform float shininess;
@@ -111,18 +110,23 @@ vec2 TextCoordinate(){
 }
 
 void main() {
-
+  // implementa o modo de mapping definido
   vec2 textCord = TextCoordinate();
+
+  // calcula a iluminação das árvores na floresta de acordo com a iluminação proveniente da lua
   vec4 colorMoon = Phong(fragN, fragLMoon, fragV, textCord, IaMoon, IdMoon, IsMoon) * IntensityLight(fragLMoon, lightDirWorldSpaceMoon, lightDiameterMoon);
+  
+  // calcula a iluminação das árvores na floresta de acordo com a iluminação proveniente da skull
   vec4 colorSkull = Phong(fragN, fragLSkull, fragV, textCord, IaSkull, IdSkull, IsSkull) * IntensityLight(fragLSkull, lightDirWorldSpaceSkull, lightDiameterSkull);
 
+  // a cor final será a junção da iluminação da lua com a iluminação da skull
   vec4 color = colorMoon + colorSkull;
 
   // define a cor final do fragmento
   if (gl_FrontFacing) {
     outColor = vec4(vis, vis, vis, 1) * color;
   } else {
-    // se estiver não estiver orientado pra frente da câmera a intensidade é metade da original
+    // se estiver não estiver orientado pra frente da câmera a cor é verde
     outColor = vec4(vis, vis, vis, 1) * color * vec4(0.5,1.0,0.5,1.0);
   }
 }

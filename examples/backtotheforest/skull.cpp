@@ -148,7 +148,7 @@ void Skull::paint(Camera m_camera, Moon m_moon) {
   abcg::glBindVertexArray(0);
 }
 
-// liberar os recursos do OpenGL que foram alocados em onCreate ou durante a aplicação
+// liberar os recursos do OpenGL que foram alocados
 void Skull::destroy() {
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);

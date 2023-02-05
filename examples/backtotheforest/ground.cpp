@@ -1,6 +1,6 @@
 #include "ground.hpp"
 
-// inicializa a floresta
+// inicializa o chão
 void Ground::create(GLuint program) {
   
   // unidade do quadrado no plano xz
